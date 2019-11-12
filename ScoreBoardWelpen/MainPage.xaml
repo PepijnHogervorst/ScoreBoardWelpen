@@ -11,8 +11,16 @@
     d:DesignHeight="480">
 
     <Grid>
-        <TextBox x:Name="TxtPressed" HorizontalAlignment="Center" Text="THIS IS JUST A RANDOM TEXTBOX" TextWrapping="Wrap" VerticalAlignment="Center" Height="33" RenderTransformOrigin="0.5,0.5">
-        </TextBox>
+        <NavigationView x:Name="nvMenu" SelectionFollowsFocus="Enabled" IsBackButtonVisible="Collapsed"
+                SelectionChanged="nvMenu_SelectionChanged" Loaded="nvMenu_Loaded"
+                ItemInvoked="NvMenu_ItemInvoked" IsSettingsVisible="False" IsPaneOpen="False" PaneDisplayMode="LeftCompact">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Home" Content="Corvee stand" Tag="Scoreboard" />
+                <NavigationViewItem Icon="Edit" Content="Verander groepjes" Tag="GroupEdit" />
+                <NavigationViewItem Icon="Admin" Content="Apparaat" Tag="Device" />
+            </NavigationView.MenuItems>
+            <Frame x:Name="contentFrame"/>
+        </NavigationView>
 
     </Grid>
 </Page>
