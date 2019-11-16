@@ -22,9 +22,35 @@ namespace ScoreBoardWelpen.Screens
     /// </summary>
     public sealed partial class Device : Page
     {
+        public Classes.GPIO IO;
+
+        private int counter = 0;
+
         public Device()
         {
             this.InitializeComponent();
+
+            IO = new Classes.GPIO();
+
+            //Events
+            if (IO.HasGPIO)
+            {
+                IO.ArcadeBtnPressed += IO_ArcadeBtnPressed;
+            }
         }
+
+        #region EVENTS
+        private async void IO_ArcadeBtnPressed(Windows.Devices.Gpio.GpioPin sender, Windows.Devices.Gpio.GpioPinValueChangedEventArgs args)
+        {
+            counter++;
+
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
+                //UI code here
+                //this.TxtPressed.Text = $"Button with pin {sender.PinNumber} number of times pressed: {counter}";
+            });
+
+        }
+        #endregion
+
     }
 }
