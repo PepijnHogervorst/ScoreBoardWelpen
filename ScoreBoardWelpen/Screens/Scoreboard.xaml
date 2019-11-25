@@ -9,6 +9,14 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button Content="Open serial" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonOpen_Click"/>
+        <Button Content="Write serial" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" Click="ButtonWrite_Click"/>
+        <Button Content="Close serial" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" Click="ButtonClose_Click"/>
 
     </Grid>
 </Page>
