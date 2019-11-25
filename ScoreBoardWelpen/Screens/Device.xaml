@@ -9,6 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" Text="Button is not pressed yet" TextWrapping="Wrap" VerticalAlignment="Center"
+                   FontSize="17" x:Name="TxtFeedback"/>
 
     </Grid>
 </Page>

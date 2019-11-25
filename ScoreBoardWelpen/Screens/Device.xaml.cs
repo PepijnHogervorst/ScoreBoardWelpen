@@ -46,7 +46,7 @@ namespace ScoreBoardWelpen.Screens
 
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => {
                 //UI code here
-                //this.TxtPressed.Text = $"Button with pin {sender.PinNumber} number of times pressed: {counter}";
+                this.TxtFeedback.Text = $"Button with pin {sender.PinNumber} number of times pressed: {counter}";
             });
 
         }
