@@ -26,5 +26,29 @@ namespace ScoreBoardWelpen.Screens
         {
             this.InitializeComponent();
         }
+
+        private void ButtonWrite_Click(object sender, RoutedEventArgs e)
+        {
+            if(Globals.Communication.IsOpen)
+            {
+                Globals.Communication.WriteSerial(sender.ToString());
+            }
+        }
+
+        private async void ButtonOpen_Click(object sender, RoutedEventArgs e)
+        {
+            Globals.Communication.OpenSerialPort();
+            if (!Globals.Communication.IsOpen)
+            {
+                
+            }
+        }
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            if(Globals.Communication.IsOpen)
+            {
+                Globals.Communication.CloseDevice();
+            }
+        }
     }
 }
