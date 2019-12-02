@@ -22,24 +22,28 @@ namespace ScoreBoardWelpen.Screens
     /// </summary>
     public sealed partial class Device : Page
     {
-        public Classes.GPIO IO;
-
         private int counter = 0;
 
         public Device()
         {
             this.InitializeComponent();
-
-            IO = new Classes.GPIO();
-
-            //Events
-            if (IO.HasGPIO)
-            {
-                IO.ArcadeBtnPressed += IO_ArcadeBtnPressed;
-            }
         }
 
+        #region Page loading
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
         #region EVENTS
+
+
         private async void IO_ArcadeBtnPressed(Windows.Devices.Gpio.GpioPin sender, Windows.Devices.Gpio.GpioPinValueChangedEventArgs args)
         {
             counter++;
@@ -52,5 +56,6 @@ namespace ScoreBoardWelpen.Screens
         }
         #endregion
 
+        
     }
 }

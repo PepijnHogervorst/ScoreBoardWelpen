@@ -26,5 +26,15 @@ namespace ScoreBoardWelpen.Screens
         {
             this.InitializeComponent();
         }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

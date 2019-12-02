@@ -120,7 +120,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Communication.cs" />
-    <Compile Include="Classes\Database.cs" />
+    <Compile Include="Classes\Storage.cs" />
     <Compile Include="Classes\Globals.cs" />
     <Compile Include="Classes\GPIO.cs" />
     <Compile Include="MainPage.xaml.cs">

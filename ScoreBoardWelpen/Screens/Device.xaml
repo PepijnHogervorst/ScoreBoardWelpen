@@ -6,7 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Page_Loaded"
+    Unloaded="Page_Unloaded"
+    d:DesignWidth="800"
+    d:DesignHeight="480">
 
     <Grid>
         <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" Text="Button is not pressed yet" TextWrapping="Wrap" VerticalAlignment="Center"
