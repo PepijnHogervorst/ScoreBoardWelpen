@@ -22,10 +22,51 @@ namespace ScoreBoardWelpen.Screens
     /// </summary>
     public sealed partial class Scoreboard : Page
     {
+        private DispatcherTimer timer = null;
         public Scoreboard()
         {
             this.InitializeComponent();
         }
+        
+        #region Page loading methods
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Globals.GPIO.ArcadeBtnPressed += GPIO_ArcadeBtnPressed;
+            timer = new DispatcherTimer();
+            timer.Tick += Timer_Tick;
+            timer.Interval = TimeSpan.FromSeconds(5);
+            timer.Stop();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // Unhook events
+            Globals.GPIO.ArcadeBtnPressed -= GPIO_ArcadeBtnPressed;
+            timer.Tick -= Timer_Tick;
+
+            // Dispose objects
+            timer.Stop();
+            timer = null;
+        }
+        #endregion
+
+        #region Events
+        private void GPIO_ArcadeBtnPressed(Windows.Devices.Gpio.GpioPin sender, Windows.Devices.Gpio.GpioPinValueChangedEventArgs args)
+        {
+            this.TxtPoints.Text = "";
+            this.TxtPressBtn.Text = "Knop ingedrukt! Punten totaal:";
+
+            // Write serial to the arduino the group nr and the points total
+            Globals.Communication.SetLeds(1, 99);
+
+            timer.Start();
+        }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            timer.Stop();
+        }
+        #endregion
 
         private void ButtonWrite_Click(object sender, RoutedEventArgs e)
         {
@@ -50,5 +91,7 @@ namespace ScoreBoardWelpen.Screens
                 Globals.Communication.CloseDevice();
             }
         }
+
+        
     }
 }
