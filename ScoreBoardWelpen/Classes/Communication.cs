@@ -83,11 +83,18 @@ namespace ScoreBoardWelpen.Classes
             }
         }
 
+        public async void SetLeds(int group, int points)
+        {
+            string ledMessage = string.Empty;
+            ledMessage = 'g' + group.ToString() + 'p' + points.ToString("D3");
+            await WriteAsync(ledMessage);
+        }
+
         public async void WriteSerial(string message)
         {
             try
             {
-                if (serialPort != null)
+                if (serialPort != null && message != null)
                 {
                     // Create the DataWriter object and attach to OutputStream
                     dataWriteObject = new DataWriter(serialPort.OutputStream);
