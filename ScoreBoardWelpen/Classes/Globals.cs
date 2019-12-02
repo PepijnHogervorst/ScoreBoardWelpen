@@ -10,6 +10,7 @@ namespace ScoreBoardWelpen
     {
         public static Classes.Communication Communication   = new Classes.Communication();
         public static Classes.GPIO          GPIO            = new Classes.GPIO();
+        public static Classes.Storage       Storage         = new Classes.Storage();
 
         public Globals()
         {

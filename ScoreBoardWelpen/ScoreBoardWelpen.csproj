@@ -120,6 +120,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\Communication.cs" />
+    <Compile Include="Classes\Database.cs" />
     <Compile Include="Classes\Globals.cs" />
     <Compile Include="Classes\GPIO.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -178,6 +179,9 @@
       <Version>2.9.7</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Data.Sqlite">
+      <Version>3.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.9</Version>
