@@ -32,7 +32,7 @@ namespace ScoreBoardWelpen
 
         private void NvMenu_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.InvokedItem is TextBlock ItemContent)
+            if (args.InvokedItemContainer is NavigationViewItem ItemContent)
             {
                 switch (ItemContent.Tag)
                 {

@@ -50,5 +50,6 @@
         <Function Type="name:serialPort" />
       </Device>
     </DeviceCapability>
+    <DeviceCapability Name="lowLevel"/>
   </Capabilities>
 </Package>

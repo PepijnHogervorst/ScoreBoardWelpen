@@ -26,9 +26,7 @@
                 <GradientStop Color="LimeGreen" Offset="1.0" />
             </LinearGradientBrush>
         </Grid.Background>
-        <Button Content="Open serial" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Click="ButtonOpen_Click"/>
-        <Button Content="Write serial" Margin="0,0,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Center" Grid.Row="1" Click="ButtonWrite_Click"/>
-        <Button Content="Close serial" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="2" Click="ButtonClose_Click"/>
+        
         <TextBlock x:Name="TxtPoints" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="2" Text="8" Margin="0,-40,0,0" 
                    FontSize="200" Foreground="White"/>
         <TextBlock x:Name="TxtPressBtn" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Text="Druk op de knop" TextWrapping="Wrap" 

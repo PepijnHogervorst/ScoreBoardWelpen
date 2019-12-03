@@ -14,7 +14,7 @@
 
     <Grid Background="Black">
         <Grid.RowDefinitions>
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="8*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -26,7 +26,32 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="LbGroup1" Grid.Row="0" FontSize="20" Margin="2" Background="Black"/>
+            <ListBox x:Name="LbGroup1" Grid.Row="0" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup2" Grid.Row="1" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup3" Grid.Row="2" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup4" Grid.Row="3" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup5" Grid.Row="4" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup6" Grid.Row="5" FontSize="20" Margin="2" Background="Black" Foreground="White"/>
         </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Background="DimGray">
+            <TextBox MaxHeight="40" x:Name="TbNewPerson" PlaceholderText="Naam van persoon" FontSize="20"
+                     Margin="5" TextChanged="TbNewPerson_TextChanged" GotFocus="TbNewPerson_GotFocus" LostFocus="TbNewPerson_LostFocus" />
+            <TextBox MaxHeight="40" x:Name="TbGroup" PlaceholderText="Grp" FontSize="20"
+                     Margin="5" TextChanged="TbGroup_TextChanged" GotFocus="TbGroup_GotFocus" LostFocus="TbGroup_LostFocus" />
+            <Button x:Name="BtnNewPerson" Click="BtnNewPerson_Click" FontSize="20" 
+                    Foreground="White" Margin="5" Style="{StaticResource ButtonRevealStyle}">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
+            </Button>
+
+        </StackPanel>
+
+        <Button x:Name="BtnRemove" FontSize="20" Foreground="White" Margin="5" Grid.Row="1"
+                Click="BtnRemove_Click" Style="{StaticResource ButtonRevealStyle}" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Verwijder geselecteerde" Margin="5,0"/>
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+            </StackPanel>
+            
+        </Button>
     </Grid>
 </Page>

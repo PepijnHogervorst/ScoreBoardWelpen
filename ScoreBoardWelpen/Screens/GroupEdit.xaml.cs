@@ -29,12 +29,82 @@ namespace ScoreBoardWelpen.Screens
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            // Event hooks:
+            hookEvents();
 
+            // Retrieve sqlite data of groups!
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
 
         }
+
+        private void BtnNewPerson_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnRemove_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TbNewPerson_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SetAddButtonActive();
+        }
+
+        private void TbNewPerson_GotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TbNewPerson_LostFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TbGroup_GotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TbGroup_LostFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TbGroup_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SetAddButtonActive();
+        }
+
+        #region EVENTS
+        private void hookEvents()
+        {
+            
+        }
+
+        private void unhookEvents()
+        {
+
+        }
+        #endregion
+
+        #region Private methods
+        private void SetAddButtonActive()
+        {
+            if (!string.IsNullOrEmpty(TbNewPerson.Text)&&
+                !string.IsNullOrEmpty(TbGroup.Text))
+            {
+                BtnNewPerson.IsEnabled = true;
+            }
+            else
+            {
+                BtnNewPerson.IsEnabled = false;
+            }
+        }
+        #endregion
     }
 }
