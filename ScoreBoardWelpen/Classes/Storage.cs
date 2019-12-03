@@ -37,8 +37,8 @@ namespace ScoreBoardWelpen.Classes
 
                 String tableCommand = "CREATE TABLE IF NOT " +
                     "EXISTS " + tables[(int)TableSelect.Groups] + " (Primary_Key INTEGER PRIMARY KEY, " +
-                    "Group INTEGER, " +
-                    "Name NVARCHAR(2048) NULL)";
+                    "GroupNr INT, " +
+                    "Name NVARCHAR(2048) NULL);";
 
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
 
@@ -46,8 +46,8 @@ namespace ScoreBoardWelpen.Classes
 
                 tableCommand = "CREATE TABLE IF NOT " +
                     "EXISTS " + tables[(int)TableSelect.Points] + " (Primary_Key INTEGER PRIMARY KEY, " +
-                    "Group INTEGER, " +
-                    "Points INTEGER)";
+                    "GroupNr INT, " +
+                    "Points INT);";
 
                 createTable = new SqliteCommand(tableCommand, db);
 
