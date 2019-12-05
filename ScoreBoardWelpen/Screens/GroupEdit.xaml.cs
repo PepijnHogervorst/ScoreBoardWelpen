@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,7 +24,7 @@ namespace ScoreBoardWelpen.Screens
     /// </summary>
     public sealed partial class GroupEdit : Page
     {
-
+        private int listBoxMemory = 0;
         public GroupEdit()
         {
             this.InitializeComponent();
@@ -42,6 +44,19 @@ namespace ScoreBoardWelpen.Screens
             this.SetAddButtonActive();
 
             // Retrieve sqlite data of groups!
+
+#if DEBUG
+            // Add some random data to table
+            LbGroup1.Items.Add("Lennart");
+            LbGroup1.Items.Add("Bae");
+            LbGroup2.Items.Add("Original Bae");
+            LbGroup3.Items.Add("Foxy");
+            LbGroup3.Items.Add("Pepijn");
+            LbGroup3.Items.Add("Peperoni");
+            LbGroup4.Items.Add("Pepijnenburg");
+            LbGroup4.Items.Add("Doltclod");
+            LbGroup4.Items.Add("Mclovin");
+#endif
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -90,12 +105,12 @@ namespace ScoreBoardWelpen.Screens
         #region EVENTS
         private void hookEvents()
         {
-            this.LbGroup1.SelectionChanged += ListBoxSelectionChanged;
+            HookListBoxEvents(true);
         }
 
         private void unhookEvents()
         {
-
+            HookListBoxEvents(false);
         }
         #endregion
 
@@ -157,18 +172,34 @@ namespace ScoreBoardWelpen.Screens
         #region Listbox methods
         private void ListBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.OriginalSource is ListBox)
+            if (sender is ListBox)
             {
-                ListBox lb = e.OriginalSource as ListBox;
+                ListBox lb = sender as ListBox;
                 int nr = Convert.ToInt32(lb.Name.Substring(lb.Name.Length - 1));
+
+                // Set button enabled because a listbox selection is pressed
+                this.BtnRemove.IsEnabled = true;
+
+                // Prevent double event loop cancelling both selection indexs dissapearing
+                if(listBoxMemory == nr)
+                {
+                    listBoxMemory = 0;
+                    return;
+                }
+
+                // Loop through all listboxes 
                 for (int i = 0; i < Globals.MaxNrOfGroups; i++)
                 {
-                    object objToFind = this.FindName("LbGroup" + i.ToString());
+                    object objToFind = this.FindName("LbGroup" + (i + 1).ToString());
                     if (objToFind is ListBox)
                     {
                         lb = objToFind as ListBox;
-                        if (i != nr)
+                        if ((i + 1) != nr)
                         {
+                            if(lb.SelectedIndex != -1)
+                            {
+                                listBoxMemory = i + 1;
+                            }
                             lb.SelectedIndex = -1;
                         }
                     }
@@ -189,6 +220,32 @@ namespace ScoreBoardWelpen.Screens
             {
                 BtnNewPerson.IsEnabled = false;
             }
+        }
+
+
+        private void HookListBoxEvents(bool subscribe)
+        {
+            int i = 1;
+            object objToFind = null;
+            ListBox lb = null;
+            do
+            {
+                objToFind = this.FindName("LbGroup" + i.ToString());
+                if (objToFind is ListBox)
+                {
+                    lb = objToFind as ListBox;
+                    if (subscribe)
+                    {
+                        lb.SelectionChanged += ListBoxSelectionChanged;
+                    }
+                    else
+                    {
+                        lb.SelectionChanged -= ListBoxSelectionChanged;
+                    }
+                }
+
+                i++;
+            } while (objToFind != null);
         }
         #endregion
 
