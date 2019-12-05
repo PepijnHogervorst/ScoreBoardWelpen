@@ -12,6 +12,8 @@ namespace ScoreBoardWelpen
         public static Classes.GPIO          GPIO            = new Classes.GPIO();
         public static Classes.Storage       Storage         = new Classes.Storage();
 
+        public const int MaxNrOfGroups = 6;
+
         public Globals()
         {
         }
