@@ -98,8 +98,8 @@ namespace ScoreBoardWelpen.Classes
                     {
                         while (query.Read())
                         {
-                            entrie.GroupNr = query.GetInt16(0);
-                            entrie.Name = query.GetString(1);
+                            entrie.GroupNr = query.GetInt16(1);
+                            entrie.Name = query.GetString(2);
                             entries.Add(entrie);
                         }
                     }
@@ -122,7 +122,7 @@ namespace ScoreBoardWelpen.Classes
                 {
                     cmd.Connection = db;
                     cmd.CommandText = Groups.DeleteCommand(
-                        $"{Groups.Columns[1].Name} IS {personName}");
+                        $"{Groups.Columns[1].Name} IS '{personName}'");
                     cmd.ExecuteNonQuery();
                 }
                 db.Close();

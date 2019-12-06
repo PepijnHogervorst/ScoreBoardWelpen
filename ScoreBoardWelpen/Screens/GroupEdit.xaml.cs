@@ -1,6 +1,4 @@
-﻿#define DEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,20 +41,31 @@ namespace ScoreBoardWelpen.Screens
             this.BtnRemove.IsEnabled = false;
             this.SetAddButtonActive();
 
-            // Retrieve sqlite data of groups!
+            // Clear data dynamically
+            object obj = null;
+            int loop = 1;
+            do
+            {
+                obj = this.FindName("LbGroup" + loop.ToString());
+                if (obj is ListBox)
+                {
+                    ListBox lb = obj as ListBox;
+                    lb.Items.Clear();
+                }
+                loop++;
+            } while (obj != null);
 
-#if DEBUG
-            // Add some random data to table
-            LbGroup1.Items.Add("Lennart");
-            LbGroup1.Items.Add("Bae");
-            LbGroup2.Items.Add("Original Bae");
-            LbGroup3.Items.Add("Foxy");
-            LbGroup3.Items.Add("Pepijn");
-            LbGroup3.Items.Add("Peperoni");
-            LbGroup4.Items.Add("Pepijnenburg");
-            LbGroup4.Items.Add("Doltclod");
-            LbGroup4.Items.Add("Mclovin");
-#endif
+            // Retrieve sqlite data of groups!
+            List<Classes.Groups> groups = Globals.Storage.GetGroups("*");
+            foreach (Classes.Groups group in groups)
+            {
+                obj = this.FindName("LbGroup" + group.GroupNr.ToString());
+                if (obj is ListBox)
+                {
+                    ListBox lb = obj as ListBox;
+                    lb.Items.Add(group.Name);
+                }
+            }
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -88,6 +97,7 @@ namespace ScoreBoardWelpen.Screens
 
         private void BtnRemove_Click(object sender, RoutedEventArgs e)
         {
+            // Loop through all listboxes to find selected and remove
             for (int i = 0; i < Globals.MaxNrOfGroups; i++)
             {
                 object objToFind = this.FindName("LbGroup" + (i + 1).ToString());
@@ -96,7 +106,12 @@ namespace ScoreBoardWelpen.Screens
                     ListBox lb = objToFind as ListBox;
                     if (lb.SelectedIndex >= 0)
                     {
+                        // Remove from database
+                        Globals.Storage.RemovePerson(lb.SelectedItem.ToString());
+                        
+                        //Remove from listbox
                         lb.Items.RemoveAt(lb.SelectedIndex);
+                        
                         break;
                     }
                 }
