@@ -14,9 +14,28 @@
 
     <Grid Background="DarkCyan">
         <Grid.RowDefinitions>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="0.1*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="0.2*"/>
         </Grid.RowDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="LbGroup1" Grid.Column="0" FontSize="18" Margin="5" Background="Black" Foreground="White"
+                         VerticalAlignment="Stretch" />
+
+                <ListBox x:Name="LbGroup2" Grid.Column="1" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup3" Grid.Column="2" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup4" Grid.Column="3" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup5" Grid.Column="4" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup6" Grid.Column="5" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+        </Grid>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -26,14 +45,21 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="LbGroup1" Grid.Column="0" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
-            <ListBox x:Name="LbGroup2" Grid.Column="1" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
-            <ListBox x:Name="LbGroup3" Grid.Column="2" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
-            <ListBox x:Name="LbGroup4" Grid.Column="3" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
-            <ListBox x:Name="LbGroup5" Grid.Column="4" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
-            <ListBox x:Name="LbGroup6" Grid.Column="5" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <TextBlock Text="Groep 1" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+            <TextBlock Text="Groep 2" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+            <TextBlock Text="Groep 3" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+            <TextBlock Text="Groep 4" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+            <TextBlock Text="Groep 5" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="4"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+            <TextBlock Text="Groep 6" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="5"
+                       FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
+                       
         </Grid>
-        <StackPanel Orientation="Horizontal" Grid.Row="1" Background="DarkCyan">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Background="DarkCyan">
             <TextBox MaxHeight="40" x:Name="TbNewPerson" PlaceholderText="Naam van persoon" FontSize="20" InputScope="Default"
                      Margin="5" TextChanged="TbNewPerson_TextChanged" GotFocus="TbNewPerson_GotFocus" LostFocus="TbNewPerson_LostFocus" 
                      MinWidth="150" MaxLength="15"/>
@@ -47,7 +73,7 @@
 
         </StackPanel>
 
-        <Button x:Name="BtnRemove" FontSize="20" Foreground="White" Margin="5" Grid.Row="1"
+        <Button x:Name="BtnRemove" FontSize="20" Foreground="White" Margin="5" Grid.Row="2"
                 Click="BtnRemove_Click" Style="{StaticResource ButtonRevealStyle}" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Verwijder geselecteerde" Margin="7,0"/>
