@@ -68,13 +68,16 @@ namespace ScoreBoardWelpen.Screens
         #region Buttons
         private void BtnNewPerson_Click(object sender, RoutedEventArgs e)
         {
-            // Add new person to database and listbox
+            // Add new person to listbox
             object objToFind = this.FindName("LbGroup" + TbGroup.Text);
             if (objToFind is ListBox)
             {
                 ListBox lb = objToFind as ListBox;
                 lb.Items.Add(TbNewPerson.Text);
             }
+
+            // Add new person to database
+            Globals.Storage.AddPerson(Convert.ToInt32(TbGroup.Text), TbNewPerson.Text);
 
             // Clear entry fields
             this.TbNewPerson.Text = "";
