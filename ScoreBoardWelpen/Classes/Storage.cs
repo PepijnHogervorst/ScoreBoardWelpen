@@ -94,14 +94,16 @@ namespace ScoreBoardWelpen.Classes
                     cmd.Connection = db;
                     cmd.CommandText = Groups.SelectCommand(columnFilter);
 
-                    using (SqliteDataReader query = cmd.ExecuteReader())
+                    SqliteDataReader reader = cmd.ExecuteReader();
+                    while (reader.HasRows)
                     {
-                        while (query.Read())
+                        while (reader.Read())
                         {
-                            entrie.GroupNr = query.GetInt16(1);
-                            entrie.Name = query.GetString(2);
+                            entrie.GroupNr = reader.GetInt16(1);
+                            entrie.Name = reader.GetString(2);
                             entries.Add(entrie);
                         }
+                        reader.NextResult();
                     }
                 }
                 db.Close();
