@@ -30,7 +30,7 @@
             <ListBox x:Name="LbGroup1" Grid.Column="0" FontSize="18" Margin="5" Background="Black" Foreground="White"
                          VerticalAlignment="Stretch" />
 
-                <ListBox x:Name="LbGroup2" Grid.Column="1" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
+            <ListBox x:Name="LbGroup2" Grid.Column="1" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
             <ListBox x:Name="LbGroup3" Grid.Column="2" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
             <ListBox x:Name="LbGroup4" Grid.Column="3" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
             <ListBox x:Name="LbGroup5" Grid.Column="4" FontSize="18" Margin="5" Background="Black" Foreground="White"/>
@@ -57,7 +57,7 @@
                        FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
             <TextBlock Text="Groep 6" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="5"
                        FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
-                       
+
         </Grid>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Background="DarkCyan">
             <TextBox MaxHeight="40" x:Name="TbNewPerson" PlaceholderText="Naam van persoon" FontSize="20" InputScope="Default"
@@ -79,7 +79,20 @@
                 <TextBlock Text="Verwijder geselecteerde" Margin="7,0"/>
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
             </StackPanel>
-            
+
         </Button>
+
+        <Border x:Name="PopupNameUnique" BorderThickness="3" BorderBrush="Gray" CornerRadius="5" Grid.Row="1"
+                MaxWidth="300" MaxHeight="150" Visibility="Collapsed">
+            <Grid Background="Black">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtNameExists" Text="Naam bestaat al in een van de groepjes" Foreground="White"
+                           VerticalAlignment="Center" FontSize="20" TextWrapping="WrapWholeWords" Margin="5"/>
+                    <Button x:Name="BtnBack" Content="Ok" Background="SlateGray" HorizontalAlignment="Right"
+                        MinWidth="100" BorderBrush="Gray" Click="BtnBack_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
+
 </Page>

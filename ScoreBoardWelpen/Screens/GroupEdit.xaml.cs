@@ -23,6 +23,8 @@ namespace ScoreBoardWelpen.Screens
     public sealed partial class GroupEdit : Page
     {
         private int listBoxMemory = 0;
+        private DispatcherTimer CloseTimer = null;
+
         public GroupEdit()
         {
             this.InitializeComponent();
@@ -77,21 +79,37 @@ namespace ScoreBoardWelpen.Screens
         #region Buttons
         private void BtnNewPerson_Click(object sender, RoutedEventArgs e)
         {
-            // Add new person to listbox
-            object objToFind = this.FindName("LbGroup" + TbGroup.Text);
-            if (objToFind is ListBox)
-            {
-                ListBox lb = objToFind as ListBox;
-                lb.Items.Add(TbNewPerson.Text);
-            }
-
             // Add new person to database
-            Globals.Storage.AddPerson(Convert.ToInt32(TbGroup.Text), TbNewPerson.Text);
+            if(!Globals.Storage.AddPerson(Convert.ToInt32(TbGroup.Text), TbNewPerson.Text))
+            {
+                // Person not unique:
+                this.PopupNameUnique.Visibility = Visibility.Visible;
 
-            // Clear entry fields
-            this.TbNewPerson.Text = "";
-            this.TbGroup.Text = "";
-            this.BtnNewPerson.IsEnabled = false;
+                // Start close popup timer 
+                if (CloseTimer == null)
+                {
+                    CloseTimer = new DispatcherTimer();
+                    CloseTimer.Interval = TimeSpan.FromSeconds(5);
+                    CloseTimer.Tick += CloseTimer_Tick;
+                    CloseTimer.Start();
+                }
+            }
+            else
+            {
+                // Add new person to listbox
+                object objToFind = this.FindName("LbGroup" + TbGroup.Text);
+                if (objToFind is ListBox)
+                {
+                    ListBox lb = objToFind as ListBox;
+                    lb.Items.Add(TbNewPerson.Text);
+                }
+
+                // Clear entry fields
+                this.TbNewPerson.Text = "";
+                this.TbGroup.Text = "";
+                this.BtnNewPerson.IsEnabled = false;
+            }
+            
             this.SetAddButtonActive();
         }
 
@@ -118,6 +136,18 @@ namespace ScoreBoardWelpen.Screens
             }
             this.BtnRemove.IsEnabled = false;
         }
+
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            this.PopupNameUnique.Visibility = Visibility.Collapsed;
+            
+            if (CloseTimer != null)
+            {
+                CloseTimer.Stop();
+                CloseTimer.Tick -= CloseTimer_Tick;
+                CloseTimer = null;
+            }
+        }
         #endregion
 
         #region EVENTS
@@ -129,6 +159,18 @@ namespace ScoreBoardWelpen.Screens
         private void unhookEvents()
         {
             HookListBoxEvents(false);
+        }
+
+        private void CloseTimer_Tick(object sender, object e)
+        {
+            this.PopupNameUnique.Visibility = Visibility.Collapsed;
+
+            if (CloseTimer != null)
+            {
+                CloseTimer.Stop();
+                CloseTimer.Tick -= CloseTimer_Tick;
+                CloseTimer = null;
+            }
         }
         #endregion
 
@@ -265,6 +307,7 @@ namespace ScoreBoardWelpen.Screens
                 i++;
             } while (objToFind != null);
         }
+
         #endregion
 
         

@@ -60,19 +60,28 @@ namespace ScoreBoardWelpen.Classes
         }
 
         #region Groups methods
-        public void AddPerson(int groupNr, string personName)
+        public bool AddPerson(int groupNr, string personName)
         {
-            using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
+            try
             {
-                db.Open();
-                using (SqliteCommand cmd = new SqliteCommand())
+                using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
                 {
-                    cmd.Connection = db;
-                    cmd.CommandText = Groups.InsertRow(new string[] { groupNr.ToString(), personName });
-                    cmd.ExecuteNonQuery();
+                    db.Open();
+                    using (SqliteCommand cmd = new SqliteCommand())
+                    {
+                        cmd.Connection = db;
+                        cmd.CommandText = Groups.InsertRow(new string[] { groupNr.ToString(), personName });
+                        cmd.ExecuteNonQuery();
+                    }
+                    db.Close();
                 }
-                db.Close();
             }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+            
         }
 
         public List<Groups> GetGroups(string columnFilter)
