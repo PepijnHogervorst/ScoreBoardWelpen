@@ -27,7 +27,7 @@ namespace ScoreBoardWelpen.Classes
         public Storage()
         {
             Groups = new Tables.Table("Groups");
-            Groups.AddColumn(new Tables.Column("GroupNr", typeof(int), true, true));
+            Groups.AddColumn(new Tables.Column("GroupNr", typeof(int), true, false));
             Groups.AddColumn(new Tables.Column("Name", typeof(string), true, true));
 
             Points = new Tables.Table("Points");
