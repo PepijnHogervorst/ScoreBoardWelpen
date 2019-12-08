@@ -99,6 +99,7 @@ namespace ScoreBoardWelpen.Classes
                     {
                         while (reader.Read())
                         {
+                            entrie = new Groups();
                             entrie.GroupNr = reader.GetInt16(1);
                             entrie.Name = reader.GetString(2);
                             entries.Add(entrie);
