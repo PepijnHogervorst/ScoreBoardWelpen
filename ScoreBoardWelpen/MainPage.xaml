@@ -13,11 +13,11 @@
     <Grid>
         <NavigationView x:Name="nvMenu" SelectionFollowsFocus="Enabled" IsBackButtonVisible="Collapsed"
                 SelectionChanged="nvMenu_SelectionChanged" Loaded="nvMenu_Loaded"
-                ItemInvoked="NvMenu_ItemInvoked" IsSettingsVisible="False" IsPaneOpen="False" PaneDisplayMode="LeftCompact">
+                ItemInvoked="NvMenu_ItemInvoked" IsSettingsVisible="True" IsPaneOpen="False" PaneDisplayMode="LeftCompact">
             <NavigationView.MenuItems>
-                <NavigationViewItem Icon="Home" Content="Corvee stand" Tag="Scoreboard" />
-                <NavigationViewItem Icon="Edit" Content="Verander groepjes" Tag="GroupEdit" />
-                <NavigationViewItem Icon="Admin" Content="Apparaat" Tag="Device" />
+                <NavigationViewItem Icon="Home" Content="Corvee stand" Tag="Scoreboard"/>
+                <NavigationViewItem Icon="AddFriend" Content="Verander groepjes" Tag="GroupEdit"/>
+                <NavigationViewItem Icon="Repair" Content="Apparaat instellingen" Tag="Device"/>
             </NavigationView.MenuItems>
             <Frame x:Name="contentFrame"/>
         </NavigationView>

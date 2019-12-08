@@ -32,23 +32,31 @@ namespace ScoreBoardWelpen
 
         private void NvMenu_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            if (args.InvokedItemContainer is NavigationViewItem ItemContent)
+            if (args.IsSettingsInvoked)
             {
-                switch (ItemContent.Tag)
+                contentFrame.Navigate(typeof(Screens.SettingsPage));
+            }
+            else
+            {
+                if (args.InvokedItemContainer is NavigationViewItem ItemContent)
                 {
-                    case "Scoreboard":
-                        contentFrame.Navigate(typeof(Screens.Scoreboard));
-                        break;
+                    switch (ItemContent.Tag)
+                    {
+                        case "Scoreboard":
+                            contentFrame.Navigate(typeof(Screens.Scoreboard));
+                            break;
 
-                    case "GroupEdit":
-                        contentFrame.Navigate(typeof(Screens.GroupEdit));
-                        break;
+                        case "GroupEdit":
+                            contentFrame.Navigate(typeof(Screens.GroupEdit));
+                            break;
 
-                    case "Device":
-                        contentFrame.Navigate(typeof(Screens.Device));
-                        break;
+                        case "Device":
+                            contentFrame.Navigate(typeof(Screens.Device));
+                            break;
+                    }
                 }
             }
+            
 
         }
 
