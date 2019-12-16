@@ -74,7 +74,7 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBlock x:Name="TxtStartDate" Text="Start van zomerkamp: " FontSize="18" 
                                VerticalAlignment="Center" Margin="13,5"/>
-                    <DatePicker x:Name="DatePickerStartDate" Margin="5" FontSize="18"/>
+                    <DatePicker x:Name="DatePickerStartDate" Margin="5" FontSize="18" DateChanged="DatePickerStartDate_DateChanged"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <TextBlock x:Name="TxtCurrentDate" Text="Huidige datum: " FontSize="18" 

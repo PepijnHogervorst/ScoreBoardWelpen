@@ -35,6 +35,7 @@ namespace ScoreBoardWelpen.Screens
         {
             // Load points data from sql storage
             GetPoints();
+            GetStartDate();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -79,6 +80,11 @@ namespace ScoreBoardWelpen.Screens
         {
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
         }
+
+        private void DatePickerStartDate_DateChanged(object sender, DatePickerValueChangedEventArgs e)
+        {
+            Globals.Storage.SettingsReplace(Classes.Storage.SettingNames.StartDateSummerCamp ,e.NewDate.ToString("d"));
+        }
         #endregion
 
         #region Private methods
@@ -119,6 +125,17 @@ namespace ScoreBoardWelpen.Screens
             } while (objToFind != null);
         }
 
+        private void GetStartDate()
+        {
+            List<Classes.Setting> settings = Globals.Storage.SettingsGet("*");
+            foreach (Classes.Setting setting in settings)
+            {
+                if (setting.Name == Classes.Storage.SettingNames.StartDateSummerCamp)
+                {
+                    this.DatePickerStartDate.Date = DateTimeOffset.Parse(setting.Value);
+                }
+            }
+        }
         #endregion
 
         

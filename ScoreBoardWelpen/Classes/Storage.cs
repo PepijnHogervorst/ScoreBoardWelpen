@@ -16,6 +16,7 @@ namespace ScoreBoardWelpen.Classes
 
         private Tables.Table Groups;
         private Tables.Table Points;
+        private Tables.Table Settings;
         private static string[] tables = new string[] { "Groups", "Points" };
 
         public enum TableSelect
@@ -34,6 +35,10 @@ namespace ScoreBoardWelpen.Classes
             Points.AddColumn(new Tables.Column("GroupNr", typeof(int), true, true));
             Points.AddColumn(new Tables.Column("Points", typeof(int), true, false));
 
+            Settings = new Tables.Table("Settings");
+            Settings.AddColumn(new Tables.Column("Name", typeof(string), true, true));
+            Settings.AddColumn(new Tables.Column("Value", typeof(string), true, true));
+
             InitializeDatabase();
         }
 
@@ -48,14 +53,18 @@ namespace ScoreBoardWelpen.Classes
                 // Create groups table
                 String tableCommand = Groups.CreateTableCommand();
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
-
                 createTable.ExecuteReader();
 
                 // Create points table
                 tableCommand = Points.CreateTableCommand();
                 createTable = new SqliteCommand(tableCommand, db);
-
                 createTable.ExecuteReader();
+
+                // Create settings table
+                tableCommand = Settings.CreateTableCommand();
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
+
             }
         }
 
@@ -214,6 +223,66 @@ namespace ScoreBoardWelpen.Classes
             return entries;
         }
         #endregion
+
+        #region Settings methods
+        public struct SettingNames
+        {
+            public const string StartDateSummerCamp = "StartDateSummerCamp";
+        }
+
+        public void SettingsReplace(string settingName, string value)
+        {
+            using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+                using (SqliteCommand cmd = new SqliteCommand())
+                {
+                    cmd.Connection = db;
+                    cmd.CommandText = Settings.ReplaceCommand(new string[] {
+                        settingName, value
+                    });
+                    cmd.ExecuteNonQuery();
+                }
+                db.Close();
+            }
+        }
+
+        public List<Setting> SettingsGet(string columnFilter)
+        {
+            List<Setting> entries = new List<Setting>();
+            Setting entrie = new Setting();
+
+            if (string.IsNullOrEmpty(columnFilter))
+            {
+                columnFilter = "*";
+            }
+
+            using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand())
+                {
+                    cmd.Connection = db;
+                    cmd.CommandText = Settings.SelectCommand(columnFilter);
+
+                    using (SqliteDataReader query = cmd.ExecuteReader())
+                    {
+                        while (query.Read())
+                        {
+                            entrie = new Setting();
+                            entrie.Name = query.GetString(1);
+                            entrie.Value = query.GetString(2);
+                            entries.Add(entrie);
+                        }
+                    }
+                    cmd.ExecuteReader();
+                }
+                db.Close();
+            }
+            return entries;
+        }
+        #endregion
     }
 
     /// <summary>
@@ -255,6 +324,27 @@ namespace ScoreBoardWelpen.Classes
         {
             get { return mPoints; }
             set { mPoints = value; }
+        }
+    }
+
+    /// <summary>
+    /// Data structure to hold group table data from queries
+    /// </summary>
+    public class Setting
+    {
+        private string mName;
+        private string mValue;
+
+        public string Value
+        {
+            get { return mValue; }
+            set { mValue = value; }
+        }
+
+        public string Name
+        {
+            get { return mName; }
+            set { mName = value; }
         }
     }
 
