@@ -12,9 +12,64 @@
     d:DesignWidth="800"
     d:DesignHeight="480">
 
-    <Grid>
-        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" Text="Button is not pressed yet" TextWrapping="Wrap" VerticalAlignment="Center"
+    <Grid Background="LightSeaGreen">
+        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" Text="Button is not pressed yet" TextWrapping="Wrap" VerticalAlignment="Bottom"
                    FontSize="17" x:Name="TxtFeedback"/>
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+            <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        BorderThickness="1" Margin="10">
+                <TextBlock x:Name="TxtPointsHeader" Text="Punten" FontSize="18" FontWeight="Bold"
+                           Margin="5"/>
+                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.45*"/>
+                        <RowDefinition Height="0.55*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="TxtGroup1" Grid.Row="0" Grid.Column="0" Text="Groep 1:"
+                               Margin="10,5"/>
+                    <TextBlock x:Name="TxtGroup2" Grid.Row="0" Grid.Column="1" Text="Groep 2:"
+                               Margin="10,5"/>
+                    <TextBlock x:Name="TxtGroup3" Grid.Row="0" Grid.Column="2" Text="Groep 3:"
+                               Margin="10,5"/>
+                    <TextBlock x:Name="TxtGroup4" Grid.Row="0" Grid.Column="3" Text="Groep 4:"
+                               Margin="10,5"/>
+                    <TextBlock x:Name="TxtGroup5" Grid.Row="0" Grid.Column="4" Text="Groep 5:"
+                               Margin="10,5"/>
+                    <TextBlock x:Name="TxtGroup6" Grid.Row="0" Grid.Column="5" Text="Groep 6:"
+                               Margin="10,5"/>
 
+                    <TextBox x:Name="TxtBoxGroup1" Grid.Row="1" Grid.Column="0" Margin="10,0,10,5"/>
+                    <TextBox x:Name="TxtBoxGroup2" Grid.Row="1" Grid.Column="1" Margin="10,0,10,5"/>
+                    <TextBox x:Name="TxtBoxGroup3" Grid.Row="1" Grid.Column="2" Margin="10,0,10,5"/>
+                    <TextBox x:Name="TxtBoxGroup4" Grid.Row="1" Grid.Column="3" Margin="10,0,10,5"/>
+                    <TextBox x:Name="TxtBoxGroup5" Grid.Row="1" Grid.Column="4" Margin="10,0,10,5"/>
+                    <TextBox x:Name="TxtBoxGroup6" Grid.Row="1" Grid.Column="5" Margin="10,0,10,5"/>
+                </Grid>
+            </StackPanel>
+            
+            <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        BorderThickness="1" Margin="10">
+                <TextBlock x:Name="TxtDateHeader" Text="Datum" FontSize="18" FontWeight="Bold"
+                           Margin="5"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock x:Name="TxtStartDate" Text="Start van zomerkamp: " FontSize="18" 
+                               VerticalAlignment="Center" Margin="13,5"/>
+                    <DatePicker x:Name="DatePickerStartDate" Margin="5" FontSize="18"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock x:Name="TxtCurrentDate" Text="Huidige datum: " FontSize="18" 
+                               VerticalAlignment="Center" Margin="5"/>
+                    <DatePicker x:Name="DatePickerCurrentDate" Margin="5" FontSize="18"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>
