@@ -23,6 +23,7 @@ namespace ScoreBoardWelpen.Screens
     public sealed partial class Device : Page
     {
         private int counter = 0;
+        private List<Classes.Points> GroupPoints;
 
         public Device()
         {
@@ -30,20 +31,19 @@ namespace ScoreBoardWelpen.Screens
         }
 
         #region Page loading
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Load points data from sql storage
+            GetPoints();
+        }
+
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
 
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
+        }        
         #endregion
 
         #region EVENTS
-
-
         private async void IO_ArcadeBtnPressed(Windows.Devices.Gpio.GpioPin sender, Windows.Devices.Gpio.GpioPinValueChangedEventArgs args)
         {
             counter++;
@@ -54,6 +54,71 @@ namespace ScoreBoardWelpen.Screens
             });
 
         }
+
+        private void TxtBoxGroup_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox)
+            {
+                TextBox textBox = sender as TextBox;
+                int nr = 0;
+                if (int.TryParse(textBox.Text, out nr))
+                {
+                    // Check which textbox changed value
+                    string bufNr = textBox.Name.Substring(textBox.Name.Length - 1);
+                    int groupNr;
+                    if (int.TryParse(bufNr, out groupNr))
+                    {
+                        // Update sqlite
+                        Globals.Storage.ReplacePoints(groupNr, nr);
+                    }
+                }
+            }
+        }
+
+        private void TxtBoxGroup_BeforeTextChanging(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
+        {
+            args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
+        }
+        #endregion
+
+        #region Private methods
+        private void GetPoints()
+        {
+            object objToFind = null;
+            int count = 1;
+            bool grpFound = false;
+            GroupPoints = Globals.Storage.GetPoints("*");
+            do
+            {
+                objToFind = this.FindName("TxtBoxGroup" + count.ToString());
+                if(objToFind != null)
+                {
+                    if(objToFind is TextBox)
+                    {
+                        TextBox textBox = objToFind as TextBox;
+                        grpFound = false;
+                        // If sql doesn't contain a row for the group create an entrie
+                        foreach (Classes.Points points in GroupPoints)
+                        {
+                            if(points.GroupNr == count)
+                            {
+                                grpFound = true;
+                                textBox.Text = points.GroupPoints.ToString();
+                                break;
+                            }
+                        }
+                        if(!grpFound)
+                        {
+                            // Add entrie of group in database.
+                            Globals.Storage.ReplacePoints(count, 0);
+                            textBox.Text = "0";
+                        }
+                    }
+                }
+                count++;
+            } while (objToFind != null);
+        }
+
         #endregion
 
         

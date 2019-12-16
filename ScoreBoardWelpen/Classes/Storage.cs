@@ -143,6 +143,23 @@ namespace ScoreBoardWelpen.Classes
         #endregion
 
         #region Points methods
+        public void ReplacePoints(int groupNr, int newPoints)
+        {
+            using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+                using (SqliteCommand cmd = new SqliteCommand())
+                {
+                    cmd.Connection = db;
+                    cmd.CommandText = Points.ReplaceCommand(new string[] {
+                        groupNr.ToString(), newPoints.ToString()
+                    });
+                    cmd.ExecuteNonQuery();
+                }
+                db.Close();
+            }
+        }
+
         public void AddPoints(int groupNr, int newPoints)
         {
             using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
@@ -184,8 +201,9 @@ namespace ScoreBoardWelpen.Classes
                     {
                         while (query.Read())
                         {
-                            entrie.GroupNr = query.GetInt16(0);
-                            entrie.GroupPoints = query.GetInt32(1);
+                            entrie = new Points();
+                            entrie.GroupNr = query.GetInt16(1);
+                            entrie.GroupPoints = query.GetInt32(2);
                             entries.Add(entrie);
                         }
                     }
@@ -370,6 +388,50 @@ namespace ScoreBoardWelpen.Classes.Tables
         public string DeleteCommand(string where)
         {
             return $"DELETE FROM {mTableName} WHERE {where};";
+        }
+        #endregion
+
+        #region REPLACE COMMANDS
+        public string ReplaceCommand(string[] data)
+        {
+            int dataPointer = 0;
+            Type columnType = null;
+            string columnNames = string.Empty;
+            string values = string.Empty;
+
+            if (data == null) return "";
+
+            foreach (Column column in mColumns)
+            {
+                //Break on data entries
+                if (dataPointer >= data.Length) break;
+
+                // Get column names from table
+                if (!string.IsNullOrEmpty(columnNames))
+                {
+                    columnNames += ", ";
+                }
+                columnNames += column.Name;
+                columnType = column.Type;
+
+                // Convert string array to values 
+                if (!string.IsNullOrEmpty(values))
+                {
+                    values += ", ";
+                }
+                if (columnType == typeof(string))
+                {
+                    values += $"'{data[dataPointer]}'";
+                }
+                else
+                {
+                    values += data[dataPointer];
+                }
+
+                dataPointer++;
+            }
+
+            return $"REPLACE INTO {mTableName} ({columnNames}) VALUES ({values});";
         }
         #endregion
     }
