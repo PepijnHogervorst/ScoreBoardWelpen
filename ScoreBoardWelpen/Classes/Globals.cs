@@ -14,6 +14,8 @@ namespace ScoreBoardWelpen
 
         public const int MaxNrOfGroups = 6;
 
+        public static int GroupTurn = 1;
+
         public Globals()
         {
         }

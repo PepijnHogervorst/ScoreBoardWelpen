@@ -34,7 +34,7 @@ namespace ScoreBoardWelpen.Classes
 
         public Communication()
         {
-
+            OpenSerialPort();
         }
 
         #region Public methods
@@ -87,7 +87,7 @@ namespace ScoreBoardWelpen.Classes
         {
             string ledMessage = string.Empty;
             ledMessage = 'g' + group.ToString() + 'p' + points.ToString("D3");
-            await WriteAsync(ledMessage);
+            WriteSerial(ledMessage);
         }
 
         public async void WriteSerial(string message)

@@ -17,7 +17,6 @@ namespace ScoreBoardWelpen.Classes
         private Tables.Table Groups;
         private Tables.Table Points;
         private Tables.Table Settings;
-        private static string[] tables = new string[] { "Groups", "Points" };
 
         public enum TableSelect
         {
@@ -228,6 +227,7 @@ namespace ScoreBoardWelpen.Classes
         public struct SettingNames
         {
             public const string StartDateSummerCamp = "StartDateSummerCamp";
+            public const string CurrentDate = "CurrentDate";
         }
 
         public void SettingsReplace(string settingName, string value)

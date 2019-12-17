@@ -13,8 +13,6 @@
     d:DesignHeight="480">
 
     <Grid Background="LightSeaGreen">
-        <TextBlock HorizontalAlignment="Center" Margin="0,0,0,0" Text="Button is not pressed yet" TextWrapping="Wrap" VerticalAlignment="Bottom"
-                   FontSize="17" x:Name="TxtFeedback"/>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
                         BorderThickness="1" Margin="10">
@@ -79,8 +77,16 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <TextBlock x:Name="TxtCurrentDate" Text="Huidige datum: " FontSize="18" 
                                VerticalAlignment="Center" Margin="5"/>
-                    <DatePicker x:Name="DatePickerCurrentDate" Margin="5" FontSize="18"/>
+                    <DatePicker x:Name="DatePickerCurrentDate" Margin="5" FontSize="18" DateChanged="DatePickerCurrentDate_DateChanged"/>
                 </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        BorderThickness="1" Margin="10">
+                <TextBlock x:Name="TxtResetHeader" Text="Begin opnieuw" FontSize="18" FontWeight="Bold"
+                           Margin="5"/>
+                <Button x:Name="BtnResetGroupStart" Content="Reset start groep naar 1" MinWidth="200" MinHeight="30" FontSize="18"
+                        Margin="147,5" Click="BtnResetGroupStart_Click"/>
             </StackPanel>
         </StackPanel>
     </Grid>

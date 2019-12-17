@@ -85,6 +85,16 @@ namespace ScoreBoardWelpen.Screens
         {
             Globals.Storage.SettingsReplace(Classes.Storage.SettingNames.StartDateSummerCamp ,e.NewDate.ToString("d"));
         }
+
+        private void DatePickerCurrentDate_DateChanged(object sender, DatePickerValueChangedEventArgs e)
+        {
+            Globals.Storage.SettingsReplace(Classes.Storage.SettingNames.CurrentDate, e.NewDate.ToString("d"));
+        }
+
+        private void BtnResetGroupStart_Click(object sender, RoutedEventArgs e)
+        {
+            Globals.GroupTurn = 1;
+        }
         #endregion
 
         #region Private methods
@@ -134,8 +144,14 @@ namespace ScoreBoardWelpen.Screens
                 {
                     this.DatePickerStartDate.Date = DateTimeOffset.Parse(setting.Value);
                 }
+                else if (setting.Name == Classes.Storage.SettingNames.CurrentDate)
+                {
+                    this.DatePickerCurrentDate.Date = DateTimeOffset.Parse(setting.Value);
+                }
             }
         }
+
+
         #endregion
 
         

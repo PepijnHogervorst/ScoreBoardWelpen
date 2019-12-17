@@ -40,7 +40,9 @@
             <TextBlock x:Name="TxtGroup" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="1" TextWrapping="Wrap" 
                    FontSize="80" Foreground="White" Margin="0,0,20,0"/>
         </StackPanel>
-        
+
+        <Button x:Name="BtnArcade" Content="Arcade button!" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Foreground="White" Click="BtnArcade_Click"/>
 
     </Grid>
 </Page>
