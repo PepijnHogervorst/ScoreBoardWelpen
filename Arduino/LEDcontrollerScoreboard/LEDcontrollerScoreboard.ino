@@ -10,16 +10,25 @@
 /************************************************************************/
 /*                             DEFINITIONS                              */
 /************************************************************************/
+// If DEBUG is defined (uncommented)the arduino will do a RGB loop through every LED_GROUP
+#define DEBUG
+// Uncomment this to test voltage drop on led strip, only works if debug is defined
+//#define DEBUG_VOLTAGE_DROP
+
+// PIN definitions of led strip groups
 #define LED_GROUP_1             2
 #define LED_GROUP_2             3
 #define LED_GROUP_3             4
 #define LED_GROUP_4             5
 #define LED_GROUP_5             6
 #define LED_GROUP_6             7
+// The total number of led strip groups:
+#define NUM_OF_GROUPS           6
+// Number of leds per group (all groups have the same amount of LEDS)
+#define NUM_OF_PIXELS           98
 
-#define NUM_OF_PIXELS           100
-
-#define BRIGHTNESS              50
+// Max brightness of the leds 
+#define BRIGHTNESS              200
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -56,6 +65,17 @@ byte neopix_gamma[] = {
 /************************************************************************/
 
 /************************************************************************/
+/*                             PROTOTYPES                               */
+/************************************************************************/
+void WriteLedStrip();
+int groupNrToPin(int nr);
+uint32_t Wheel(byte WheelPos);
+void DebugLoop(void);
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+
+/************************************************************************/
 /*                                 SETUP                                */
 /************************************************************************/
 void setup() {
@@ -69,12 +89,29 @@ void setup() {
   // Init the led strip
   led_strip.setBrightness(BRIGHTNESS);
   led_strip.begin();
-  led_strip.show();
+  led_strip.clear();
+
+  // Clear all ledstrip groups
+  int pin = 0;
+  for (int i = 1; i <= NUM_OF_GROUPS; i++)
+  {
+    pin = groupNrToPin(i);
+    led_strip.setPin(pin);
+    led_strip.clear();
+  }
+  
 
   // Extra randomness for start color 
   randomSeed(analogRead(0));
 
   Serial.println("Initialization done!");
+  #ifdef DEBUG 
+  #ifdef DEBUG_VOLTAGE_DROP
+  Serial.println("Debug VOLTAGE DROP mode active");
+  #else
+  Serial.println("Debug mode active");
+  #endif
+  #endif
 }
 /************************************************************************/
 /*                                                                      */
@@ -84,6 +121,7 @@ void setup() {
 /*                                MAIN LOOP                             */
 /************************************************************************/
 void loop() {
+  #ifndef DEBUG
   // Check if serial message is received
   if(messageReceived)
   {
@@ -94,7 +132,11 @@ void loop() {
     // Clear event
     messageReceived = false;
     inputString = "";
-  }
+  }`
+  #else
+  // Debug mode! 
+  DebugLoop();
+  #endif
 }
 /************************************************************************/
 /*                                                                      */
@@ -209,7 +251,8 @@ int groupNrToPin(int nr)
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) {
+uint32_t Wheel(byte WheelPos) 
+{
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
     return led_strip.Color(255 - WheelPos * 3, 0, WheelPos * 3,0);
@@ -220,6 +263,40 @@ uint32_t Wheel(byte WheelPos) {
   }
   WheelPos -= 170;
   return led_strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0,0);
+}
+
+void DebugLoop(void)
+{
+  static uint8_t groupCounter = 1;
+  int ledPin = 0;
+  if (groupCounter > NUM_OF_GROUPS)
+  {
+    groupCounter = 1;
+  }
+  // Set pin to right group:
+  ledPin = groupNrToPin(groupCounter);
+  led_strip.clear();
+  led_strip.setPin(ledPin);
+
+  // Randomness
+  long randomNr = random(256);
+
+  // Show LEDS 
+  for(int16_t i = 0; i < led_strip.numPixels(); i++)
+  {
+    #ifdef DEBUG_VOLTAGE_DROP
+    led_strip.setPixelColor(i, led_strip.Color(255,255,255));
+    #else
+    led_strip.setPixelColor(i, Wheel(((i * 256 / led_strip.numPixels()) + randomNr) & 255));
+    #endif
+  }
+  led_strip.show();
+  Serial.print("LEDs group ");
+  Serial.print(groupCounter);
+  Serial.println(" set!");
+  delay(250);
+
+  groupCounter++;
 }
 /************************************************************************/
 /*                                                                      */
