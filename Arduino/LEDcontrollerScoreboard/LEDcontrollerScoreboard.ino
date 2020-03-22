@@ -29,6 +29,13 @@
 
 // Max brightness of the leds 
 #define BRIGHTNESS              200
+
+#define LED_OFFSET_1            0
+#define LED_OFFSET_2            (NUM_OF_PIXELS * 1)/ NUM_OF_GROUPS 
+#define LED_OFFSET_3            (NUM_OF_PIXELS * 2)/ NUM_OF_GROUPS 
+#define LED_OFFSET_4            (NUM_OF_PIXELS * 3)/ NUM_OF_GROUPS 
+#define LED_OFFSET_5            (NUM_OF_PIXELS * 4)/ NUM_OF_GROUPS 
+#define LED_OFFSET_6            (NUM_OF_PIXELS * 5)/ NUM_OF_GROUPS 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -71,6 +78,7 @@ void WriteLedStrip();
 int groupNrToPin(int nr);
 uint32_t Wheel(byte WheelPos);
 void DebugLoop(void);
+void PartyLoop(void);
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -80,7 +88,7 @@ void DebugLoop(void);
 /************************************************************************/
 void setup() {
   // Init serial communication:
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial1.begin(9600);
 
   // Allocate memory for string
@@ -135,7 +143,8 @@ void loop() {
   }`
   #else
   // Debug mode! 
-  DebugLoop();
+  PartyLoop();
+  // DebugLoop();
   #endif
 }
 /************************************************************************/
@@ -297,6 +306,35 @@ void DebugLoop(void)
   delay(250);
 
   groupCounter++;
+}
+
+void PartyLoop(void)
+{
+  static uint16_t colorOffset = 0; 
+  int ledPin = 0;
+  uint16_t ledStart = 0;
+  // Check if offset is at end of led total count
+  if (colorOffset >= (NUM_OF_GROUPS * NUM_OF_PIXELS))
+  {
+    colorOffset = 0;
+  }
+  // Loop through all led strips
+  for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
+  {
+    ledPin = groupNrToPin(groupCount);
+    led_strip.setPin(ledPin);
+    // Each led strip has his own start point 
+    ledStart = (groupCount * led_strip.numPixels()) + colorOffset;
+
+    for (uint16_t i = 0; i < led_strip.numPixels(); i++)
+    {
+      led_strip.setPixelColor(i, Wheel(((i * 256 / led_strip.numPixels()) + ledStart) & 255));
+    }
+    led_strip.show();
+  }
+  delay(5);
+  
+  colorOffset++;
 }
 /************************************************************************/
 /*                                                                      */
