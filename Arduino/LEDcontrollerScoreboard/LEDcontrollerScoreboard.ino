@@ -2,16 +2,25 @@
 /*                               INCLUDES                               */
 /************************************************************************/
 #include <Adafruit_NeoPixel.h>
-
+#include <EEPROM.h>
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-
+// Protocol works as following:
+// Arduino receives commands from rpi of size: 6 bytes. In following structure:
+// gXpXXX -> the first X is for the group 
+// groupNr points
+// Brightness is also adjustable using:
+// bbbXXX => XXX is brightness from 0 to 255
+// Party mode is actived using:
+// pppXXX => XXX is party mode program selection
+// Stop party mode:
+// sXXXXX => dont care as long if msg is 6 bytes
 /************************************************************************/
 /*                             DEFINITIONS                              */
 /************************************************************************/
 // If DEBUG is defined (uncommented)the arduino will do a RGB loop through every LED_GROUP
-#define DEBUG
+//#define DEBUG
 // Uncomment this to test voltage drop on led strip, only works if debug is defined
 //#define DEBUG_VOLTAGE_DROP
 
@@ -29,6 +38,7 @@
 
 // Max brightness of the leds 
 #define BRIGHTNESS              200
+#define BRIGHTNESS_ADDRESS      0
 
 #define LED_OFFSET_1            0
 #define LED_OFFSET_2            (255 * 1)/ NUM_OF_GROUPS 
@@ -36,6 +46,8 @@
 #define LED_OFFSET_4            (255 * 3)/ NUM_OF_GROUPS 
 #define LED_OFFSET_5            (255 * 4)/ NUM_OF_GROUPS 
 #define LED_OFFSET_6            (255 * 5)/ NUM_OF_GROUPS 
+
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -48,6 +60,11 @@ Adafruit_NeoPixel led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_
 
 String inputString = "";
 bool messageReceived = false;
+bool IsPartyMode = false;
+unsigned long prevEventTime = 0;
+
+const char SoftwareVersion[] = "V0.1";
+const char compile_date[] = __DATE__ " " __TIME__;
 
 // Lookup table 
 byte neopix_gamma[] = {
@@ -74,12 +91,14 @@ byte neopix_gamma[] = {
 /************************************************************************/
 /*                             PROTOTYPES                               */
 /************************************************************************/
+void DeciferMessage();
 void WriteLedStrip();
 int groupNrToPin(int nr);
 int groupNrToOffset(int nr);
 uint32_t Wheel(byte WheelPos);
 void DebugLoop(void);
 void PartyLoop(void);
+void ClearLEDstrips(void);
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -92,22 +111,31 @@ void setup() {
   Serial.begin(115200);
   Serial1.begin(9600);
 
+  Serial.print("LEDcontrollerScoreboard ");
+  Serial.println(SoftwareVersion);
+  Serial.print("Compile date: ");
+  Serial.println(compile_date);
   // Allocate memory for string
   inputString.reserve(200);
   
+  // Startup delay to let power supply stabilize
+  delay(2000);
+
+  // Retrieve brightness from eeprom
+  int brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+  Serial.print("Brightness set to: ");
+  Serial.println(brightness);
+  if (brightness == 0)
+  {
+    brightness = BRIGHTNESS;
+  }
+
   // Init the led strip
-  led_strip.setBrightness(BRIGHTNESS);
+  led_strip.setBrightness(brightness);
   led_strip.begin();
   led_strip.clear();
 
-  // Clear all ledstrip groups
-  int pin = 0;
-  for (int i = 1; i <= NUM_OF_GROUPS; i++)
-  {
-    pin = groupNrToPin(i);
-    led_strip.setPin(pin);
-    led_strip.clear();
-  }
+  ClearLEDstrips();
   
 
   // Extra randomness for start color 
@@ -136,12 +164,17 @@ void loop() {
   {
     // Handle event
     Serial.println("Message received: " + inputString);
-    WriteLedStrip();
+    DeciferMessage();
     
     // Clear event
     messageReceived = false;
     inputString = "";
-  }`
+  }
+  if (IsPartyMode)
+  {
+    PartyLoop();
+  }
+  
   #else
   // Debug mode! 
   PartyLoop();
@@ -155,20 +188,30 @@ void loop() {
 /************************************************************************/
 /*                              EVENTS                                  */
 /************************************************************************/
-void serialEvent1() {
+void serialEvent1() 
+{
+  unsigned long currentTime = millis();
+  if ((currentTime - prevEventTime) > 500 ||
+     (((prevEventTime + 500) > currentTime) && prevEventTime > currentTime))
+  {
+    inputString = "";
+    Serial.println("Purged serial input buffer");
+  }
+  
   while (Serial1.available()) 
   {
     // get the new byte:
     char inChar = (char)Serial1.read();
     // add it to the inputString:
     inputString += inChar;
-    
+
     //if inputstring is length 6, the full message is received so signal 
     if (inputString.length() >= 6) 
     {
       messageReceived = true;
     }
   }
+  prevEventTime = millis();
 }
 /************************************************************************/
 /*                                                                      */
@@ -179,6 +222,44 @@ void serialEvent1() {
 /************************************************************************/
 // Function where most of the magic happens, 
 // decifers serial input and sets leds using a color wheel
+void DeciferMessage()
+{
+  char functionChar = inputString.charAt(0);
+  
+  // Check first char if msg is led command or brightness or else
+  switch (functionChar)
+  {
+    case 'g':
+      // Led program
+      WriteLedStrip();
+      // Reset party mode on serial receiving
+      if (IsPartyMode)
+      {
+        Serial.println("Party canceled..");
+        ClearLEDstrips();
+      }
+      IsPartyMode = false;
+      break;
+    case 'b':
+      // Led program
+      SetLEDBrightness();
+      break;
+    case 'p':
+      // Pary mode!
+      IsPartyMode = true;
+      Serial.println("Party is on!");
+      break;
+    case 's':
+      IsPartyMode = false;
+      Serial.println("Party canceled..");
+      ClearLEDstrips();
+      break;
+  
+    default:
+      break;
+  }
+}
+
 void WriteLedStrip()
 {
   int groupNr = 0; int16_t points = 0;
@@ -220,7 +301,6 @@ void WriteLedStrip()
   Serial.println(points);
   
   // Set ledstrip pin to group ledstrip pin
-  led_strip.clear();
   led_strip.setPin(ledPin);
 
   // Get random offset 
@@ -228,6 +308,9 @@ void WriteLedStrip()
   uint16_t loopCount = 1;
   uint16_t delayTime = (5000 / points) - 1;
   
+  // Clear previously show points on strip
+  led_strip.clear();
+  led_strip.show();
   do
   {
     for(int16_t i = 0; i < loopCount; i++)
@@ -238,9 +321,23 @@ void WriteLedStrip()
     delay(delayTime);
     loopCount++;
   }
-  while(loopCount < points);
+  while(loopCount <= points);
 
-  Serial.println("LEDS set! Waiting for new serial command");
+  Serial.println("LEDS set! Waiting for new serial command..");
+}
+
+void SetLEDBrightness()
+{
+  String buf = inputString.substring(3);
+  int bright = buf.toInt();
+  led_strip.setBrightness(bright);
+  EEPROM.write(BRIGHTNESS_ADDRESS, bright);
+
+  Serial.println();
+  Serial.print("Brightness set to: ");
+  Serial.println(bright);
+  Serial.println("Waiting for new serial command..");
+  Serial.println();
 }
 
 int groupNrToPin(int nr)
@@ -355,6 +452,18 @@ int groupNrToOffset(int nr)
   }
 
   return pin;
+}
+
+void ClearLEDstrips()
+{
+  int pin = 0;
+  for (int i = 1; i <= NUM_OF_GROUPS; i++)
+  {
+    pin = groupNrToPin(i);
+    led_strip.setPin(pin);
+    led_strip.clear();
+    led_strip.show();
+  }
 }
 /************************************************************************/
 /*                                                                      */
