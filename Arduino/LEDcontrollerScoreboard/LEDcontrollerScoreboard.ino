@@ -31,11 +31,11 @@
 #define BRIGHTNESS              200
 
 #define LED_OFFSET_1            0
-#define LED_OFFSET_2            (NUM_OF_PIXELS * 1)/ NUM_OF_GROUPS 
-#define LED_OFFSET_3            (NUM_OF_PIXELS * 2)/ NUM_OF_GROUPS 
-#define LED_OFFSET_4            (NUM_OF_PIXELS * 3)/ NUM_OF_GROUPS 
-#define LED_OFFSET_5            (NUM_OF_PIXELS * 4)/ NUM_OF_GROUPS 
-#define LED_OFFSET_6            (NUM_OF_PIXELS * 5)/ NUM_OF_GROUPS 
+#define LED_OFFSET_2            (255 * 1)/ NUM_OF_GROUPS 
+#define LED_OFFSET_3            (255 * 2)/ NUM_OF_GROUPS 
+#define LED_OFFSET_4            (255 * 3)/ NUM_OF_GROUPS 
+#define LED_OFFSET_5            (255 * 4)/ NUM_OF_GROUPS 
+#define LED_OFFSET_6            (255 * 5)/ NUM_OF_GROUPS 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -76,6 +76,7 @@ byte neopix_gamma[] = {
 /************************************************************************/
 void WriteLedStrip();
 int groupNrToPin(int nr);
+int groupNrToOffset(int nr);
 uint32_t Wheel(byte WheelPos);
 void DebugLoop(void);
 void PartyLoop(void);
@@ -312,9 +313,10 @@ void PartyLoop(void)
 {
   static uint16_t colorOffset = 0; 
   int ledPin = 0;
+  int groupOffset = 0;
   uint16_t ledStart = 0;
   // Check if offset is at end of led total count
-  if (colorOffset >= (NUM_OF_GROUPS * NUM_OF_PIXELS))
+  if (colorOffset >= 255)
   {
     colorOffset = 0;
   }
@@ -322,9 +324,11 @@ void PartyLoop(void)
   for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
   {
     ledPin = groupNrToPin(groupCount);
+    groupOffset = groupNrToOffset(groupCount);
+
     led_strip.setPin(ledPin);
     // Each led strip has his own start point 
-    ledStart = (groupCount * led_strip.numPixels()) + colorOffset;
+    ledStart = groupOffset + colorOffset;
 
     for (uint16_t i = 0; i < led_strip.numPixels(); i++)
     {
@@ -335,6 +339,22 @@ void PartyLoop(void)
   delay(5);
   
   colorOffset++;
+}
+
+int groupNrToOffset(int nr)
+{
+  int pin = 0;
+  switch(nr)
+  {
+    case 1: pin = LED_OFFSET_1; break;
+    case 2: pin = LED_OFFSET_2; break;
+    case 3: pin = LED_OFFSET_3; break;
+    case 4: pin = LED_OFFSET_4; break;
+    case 5: pin = LED_OFFSET_5; break;
+    case 6: pin = LED_OFFSET_6; break;
+  }
+
+  return pin;
 }
 /************************************************************************/
 /*                                                                      */
