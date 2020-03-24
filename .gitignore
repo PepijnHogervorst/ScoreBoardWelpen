@@ -1,2 +1,5 @@
 # Folders / directories
 /DataAccessLibrary
+/.vscode
+/Arduino/LEDcontrollerScoreboard/.vscode/
+/Arduino/LEDcontrollerScoreboard/.vs/
