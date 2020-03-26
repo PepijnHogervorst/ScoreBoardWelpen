@@ -18,27 +18,36 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                <GradientStop Color="Yellow" Offset="0.0" />
-                <GradientStop Color="Red" Offset="0.25" />
-                <GradientStop Color="Blue" Offset="0.75" />
-                <GradientStop Color="LimeGreen" Offset="1.0" />
-            </LinearGradientBrush>
-        </Grid.Background>
-        
+        <Grid Grid.Row="0" Grid.RowSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Rectangle Fill="#FF00AB08" Grid.Column="0"/>
+            <Rectangle Fill="#FF00C301" Grid.Column="1"/>
+            <Rectangle Fill="#FF26D701" Grid.Column="2"/>
+            <Rectangle Fill="#FF26D701" Grid.Column="3"/>
+            <Rectangle Fill="#FF00C301" Grid.Column="4"/>
+            <Rectangle Fill="#FF00AB08" Grid.Column="5"/>
+        </Grid>
+
         <TextBlock x:Name="TxtPoints" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="2" Text="8" Margin="0,-40,0,0" 
                    FontSize="200" Foreground="White"/>
         <TextBlock x:Name="TxtPressBtn" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Text="Druk op de knop" TextWrapping="Wrap" 
                    FontSize="100" Foreground="White"/>
         <TextBlock x:Name="TxtName" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Text="Naam" TextWrapping="Wrap" 
-                   FontSize="70" Foreground="White" Margin="10,0,0,0"/>
+                   FontSize="70" Foreground="White" Margin="30,0,0,0"/>
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
             <TextBlock x:Name="TxtGroupTxt" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="Groepje:" TextWrapping="Wrap" 
                    FontSize="70" Foreground="White" Margin="0,0,10,0"/>
             <TextBlock x:Name="TxtGroup" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="1" TextWrapping="Wrap" 
-                   FontSize="80" Foreground="White" Margin="0,0,20,0"/>
+                   FontSize="80" Foreground="White" Margin="0,0,30,0"/>
         </StackPanel>
 
         <Button x:Name="BtnArcade" Content="Arcade button!" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
