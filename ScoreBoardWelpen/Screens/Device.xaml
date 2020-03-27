@@ -15,7 +15,7 @@
     <Grid Background="LightSeaGreen">
         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
             <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        BorderThickness="1" Margin="10">
+                        BorderThickness="1" Margin="10" CornerRadius="5">
                 <TextBlock x:Name="TxtPointsHeader" Text="Punten" FontSize="18" FontWeight="Bold"
                            Margin="5"/>
                 <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -66,7 +66,7 @@
             </StackPanel>
             
             <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        BorderThickness="1" Margin="10">
+                        BorderThickness="1" Margin="10" CornerRadius="5">
                 <TextBlock x:Name="TxtDateHeader" Text="Datum" FontSize="18" FontWeight="Bold"
                            Margin="5"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -82,7 +82,7 @@
             </StackPanel>
 
             <StackPanel Orientation="Vertical" BorderBrush="Black" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        BorderThickness="1" Margin="10">
+                        BorderThickness="1" Margin="10" CornerRadius="5">
                 <TextBlock x:Name="TxtResetHeader" Text="Begin opnieuw" FontSize="18" FontWeight="Bold"
                            Margin="5"/>
                 <Button x:Name="BtnResetGroupStart" Content="Reset start groep naar 1" MinWidth="200" MinHeight="30" FontSize="18"
