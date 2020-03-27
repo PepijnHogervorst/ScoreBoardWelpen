@@ -31,6 +31,12 @@
 #define LED_GROUP_4             5
 #define LED_GROUP_5             6
 #define LED_GROUP_6             7
+
+// INPUTS
+#define BTN_ARCADE              40
+// OUTPUTS
+#define BTN_INDICATOR           41
+
 // The total number of led strip groups:
 #define NUM_OF_GROUPS           6
 // Number of leds per group (all groups have the same amount of LEDS)
@@ -56,12 +62,17 @@
 /*                            GLOBAL VARIABLES                          */
 /************************************************************************/
 // One neopixel object is used, and the pin is switched when a different strip is needed to put on.
-Adafruit_NeoPixel led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
+Adafruit_NeoPixel led_strip;
 
 String inputString = "";
+String ledMsg = "";
 bool messageReceived = false;
 bool IsPartyMode = false;
+bool IsArcadeBtnEnabled = false;
 unsigned long prevEventTime = 0;
+
+int GroupNr = 0;
+int Points = 0;
 
 const char SoftwareVersion[] = "V0.1";
 const char compile_date[] = __DATE__ " " __TIME__;
@@ -119,7 +130,8 @@ void setup() {
   inputString.reserve(200);
   
   // Startup delay to let power supply stabilize
-  delay(2000);
+  delay(3000);
+  led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
 
   // Retrieve brightness from eeprom
   int brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
@@ -136,7 +148,11 @@ void setup() {
   led_strip.clear();
 
   ClearLEDstrips();
-  
+
+  // Init IO
+  pinMode(BTN_ARCADE, INPUT);
+  pinMode(BTN_INDICATOR, OUTPUT);
+  digitalWrite(BTN_INDICATOR, LOW);
 
   // Extra randomness for start color 
   randomSeed(analogRead(0));
@@ -174,6 +190,20 @@ void loop() {
   {
     PartyLoop();
   }
+  if (IsArcadeBtnEnabled)
+  {
+    if (digitalRead(BTN_ARCADE) == HIGH)
+    {
+      delay(75);
+      if (digitalRead(BTN_ARCADE) == HIGH)
+      {
+        WriteLedStrip();
+      }
+    }
+  }
+  
+
+  
   
   #else
   // Debug mode! 
@@ -230,8 +260,6 @@ void DeciferMessage()
   switch (functionChar)
   {
     case 'g':
-      // Led program
-      WriteLedStrip();
       // Reset party mode on serial receiving
       if (IsPartyMode)
       {
@@ -239,6 +267,10 @@ void DeciferMessage()
         ClearLEDstrips();
       }
       IsPartyMode = false;
+
+      // Enable the button, when pressed write ledstrip
+      EnableArcadeButton();
+      //WriteLedStrip();
       break;
     case 'b':
       // Led program
@@ -254,26 +286,37 @@ void DeciferMessage()
       Serial.println("Party canceled..");
       ClearLEDstrips();
       break;
+    case 'c':
+      Serial.println("Clearing ledstrips");
+      if (IsPartyMode)
+      {
+        
+        ClearLEDstrips();
+      }
+      IsPartyMode = false;
+      ClearLEDstrips();
+      break;
   
     default:
       break;
   }
 }
 
-void WriteLedStrip()
+void EnableArcadeButton()
 {
-  int groupNr = 0; int16_t points = 0;
-  int ledPin = 0; 
-  char grpChar = inputString.charAt(1);
+  IsArcadeBtnEnabled = true;
+  // Copy message to ledMsg
+  ledMsg = inputString;
+  // Set LED in arcade button to signal it is active
+  digitalWrite(BTN_INDICATOR, HIGH);
+
+  // Calculate group and points
+  char grpChar = ledMsg.charAt(1);
   String pointsString = inputString.substring(3);
 
-  // Get the group nr and pin nr
-  groupNr = grpChar - '0';
-  ledPin = groupNrToPin(groupNr);
-  // Check if pin is valid otherwise return
-  if(ledPin == 0)
-    return;
-    
+   // Get the group nr and pin nr
+  GroupNr = grpChar - '0';
+
   for(int i = 0; i < pointsString.length(); i++)
   {
     if(!isDigit(pointsString.charAt(i)))
@@ -285,20 +328,34 @@ void WriteLedStrip()
   }
 
   // Set points
-  points = pointsString.toInt();
-  if (points > led_strip.numPixels())
+  Points = pointsString.toInt();
+  if (Points > led_strip.numPixels())
   {
-    points = led_strip.numPixels();
+    Points = led_strip.numPixels();
   }
-  else if (points < 0)
+  else if (Points < 0)
   {
-    points = 0;
+    Points = 0;
   }
+}
 
+void WriteLedStrip()
+{
+  int ledPin = 0; 
+
+  delay(100);
+  IsArcadeBtnEnabled = false;
+  digitalWrite(BTN_INDICATOR, LOW);
+
+  ledPin = groupNrToPin(GroupNr);
+  // Check if pin is valid otherwise return
+  if(ledPin == 0)
+    return;
+  
   Serial.print("Group: ");
-  Serial.print(groupNr);
+  Serial.print(GroupNr);
   Serial.print("   Points: ");
-  Serial.println(points);
+  Serial.println(Points);
   
   // Set ledstrip pin to group ledstrip pin
   led_strip.setPin(ledPin);
@@ -306,7 +363,7 @@ void WriteLedStrip()
   // Get random offset 
   long randomNr = random(256);
   uint16_t loopCount = 1;
-  uint16_t delayTime = (5000 / points) - 1;
+  uint16_t delayTime = (5000 / Points) - 1;
   
   // Clear previously show points on strip
   led_strip.clear();
@@ -321,9 +378,11 @@ void WriteLedStrip()
     delay(delayTime);
     loopCount++;
   }
-  while(loopCount <= points);
+  while(loopCount <= Points);
 
   Serial.println("LEDS set! Waiting for new serial command..");
+
+  Serial1.print("DONE");
 }
 
 void SetLEDBrightness()
