@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -21,6 +22,9 @@ namespace ScoreBoardWelpen.Classes
     /// </summary>
     public class Communication
     {
+        #region Event raising
+        public event EventHandler<EventArgs> DataReceived;
+        #endregion
         private SerialDevice serialPort = null;
         DataWriter dataWriteObject = null;
         DataReader dataReaderObject = null;
@@ -88,6 +92,9 @@ namespace ScoreBoardWelpen.Classes
             string ledMessage = string.Empty;
             ledMessage = 'g' + group.ToString() + 'p' + points.ToString("D3");
             WriteSerial(ledMessage);
+            // Start task to listen to incoming reply from arduino
+            // Arduino sends DONE when leds are set!
+            Listen();
         }
 
         public async void WriteSerial(string message)
@@ -101,6 +108,8 @@ namespace ScoreBoardWelpen.Classes
 
                     //Launch the WriteAsync task to perform the write
                     await WriteAsync(message);
+
+                    
 
                 }
             }
@@ -203,11 +212,11 @@ namespace ScoreBoardWelpen.Classes
 
                 // Launch the task and wait
                 UInt32 bytesRead = await loadAsyncTask;
-                if (bytesRead > 0)
+                if (bytesRead >= 3)
                 {
                     // Fire event with the read data:
                     string data = dataReaderObject.ReadString(bytesRead);
-                    //rcvdText.Text = dataReaderObject.ReadString(bytesRead);
+                    DataReceived?.Invoke(this, new EventArgs());
                 }
             }
         }

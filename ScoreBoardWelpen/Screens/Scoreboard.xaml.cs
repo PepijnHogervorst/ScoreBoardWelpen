@@ -38,7 +38,7 @@ namespace ScoreBoardWelpen.Screens
         #region Page loading methods
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            hookEvents();
+            HookEvents();
 
             InitTimer();
 
@@ -49,7 +49,7 @@ namespace ScoreBoardWelpen.Screens
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            unhookEvents();
+            UnhookEvents();
             
             timer.Tick -= Timer_Tick;
 
@@ -60,76 +60,64 @@ namespace ScoreBoardWelpen.Screens
         #endregion
 
         #region Events
-        private void hookEvents()
+        private void HookEvents()
         {
-            Globals.GPIO.ArcadeBtnPressed += GPIO_ArcadeBtnPressed;
-
-        }
-        private void unhookEvents()
-        {
-            Globals.GPIO.ArcadeBtnPressed -= GPIO_ArcadeBtnPressed;
+            Globals.Communication.DataReceived += Communication_DataReceived;
         }
 
-        private void GPIO_ArcadeBtnPressed(Windows.Devices.Gpio.GpioPin sender, Windows.Devices.Gpio.GpioPinValueChangedEventArgs args)
+        private void UnhookEvents()
         {
-            this.TxtPoints.Text = "";
-            this.TxtPressBtn.Text = "Knop ingedrukt! Punten totaal:";
-
-            // Write serial to the arduino the group nr and the points total
-            Globals.Communication.SetLeds(1, 99);
-
-            timer.Start();
+            Globals.Communication.DataReceived -= Communication_DataReceived;
         }
 
-        private void Timer_Tick(object sender, object e)
+        private void Communication_DataReceived(object sender, EventArgs e)
         {
-            if (!timerFlag)
+            // When reply is received, set the points total visible,
+            // Arduino is done when serial is send
+            this.TxtPoints.Visibility = Visibility.Visible;
+            if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
             {
-                this.TxtPoints.Visibility = Visibility.Visible;
-                if(Globals.GroupTurn >= Globals.MaxNrOfGroups)
-                {
-                    Globals.GroupTurn = 1;
-                }
-                else
-                {
-                    Globals.GroupTurn++;
-                }
-                timerFlag = true;
+                Globals.GroupTurn = 1;
             }
             else
             {
-                timer.Stop();
-                displayPerson();
-                timerFlag = false;
-                this.TxtPressBtn.Visibility = Visibility.Visible;
-                this.BtnArcade.IsEnabled = true;
+                Globals.GroupTurn++;
             }
+            // Start timer to show new group after x seconds
+            timer.Start();
+        }
+
+
+        private void Timer_Tick(object sender, object e)
+        {
+            timer.Stop();
+            displayPerson();
+            this.TxtPressBtn.Visibility = Visibility.Visible;
+
+            // Update group and send info to arduino
+            if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
+            {
+                this.BtnStart.Visibility = Visibility.Visible;
+                this.BtnRety.Visibility = Visibility.Collapsed;
+                return;
+            }
+            Globals.GroupTurn++;
+            SendPointsInfo();
         }
         #endregion
 
         #region Button events
-        private void BtnArcade_Click(object sender, RoutedEventArgs e)
+        private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-            // Write points to arduino
-            int pointsToWrite = 0;
-            foreach (Classes.Points point in points)
-            {
-                if(point.GroupNr == Globals.GroupTurn)
-                {
-                    pointsToWrite = point.GroupPoints;
-                    break;
-                }
-            }
-            Globals.Communication.SetLeds(Globals.GroupTurn, pointsToWrite);
-            this.TxtPoints.Visibility = Visibility.Collapsed;
-            this.TxtPoints.Text = pointsToWrite.ToString();
+            Globals.GroupTurn = 1;
+            SendPointsInfo();
+            this.BtnStart.Visibility = Visibility.Collapsed;
+            this.TxtPressBtn.Visibility = Visibility.Visible;
+        }
 
-            //Disable the button 
-            this.BtnArcade.IsEnabled = false;
-            this.TxtPressBtn.Visibility = Visibility.Collapsed;
-            this.TxtPoints.Visibility = Visibility.Collapsed;
-            // Start timer that shows points after interval
-            timer.Start();
+        private void BtnRetry_Click(object sender, RoutedEventArgs e)
+        {
+            SendPointsInfo();
         }
         #endregion
 
@@ -226,6 +214,27 @@ namespace ScoreBoardWelpen.Screens
             }
 
             return mygroups;
+        }
+
+        private void SendPointsInfo()
+        {
+            // Write points to arduino
+            int pointsToWrite = 0;
+            foreach (Classes.Points point in points)
+            {
+                if (point.GroupNr == Globals.GroupTurn)
+                {
+                    pointsToWrite = point.GroupPoints;
+                    break;
+                }
+            }
+            Globals.Communication.SetLeds(Globals.GroupTurn, pointsToWrite);
+            this.TxtPoints.Visibility = Visibility.Collapsed;
+            this.TxtPoints.Text = pointsToWrite.ToString();
+
+            //Disable the button 
+            this.TxtPressBtn.Visibility = Visibility.Collapsed;
+            this.TxtPoints.Visibility = Visibility.Collapsed;
         }
         #endregion
 
