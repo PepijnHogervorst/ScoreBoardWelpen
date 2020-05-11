@@ -36,7 +36,7 @@
             <Rectangle Fill="#FF00AB08" Grid.Column="5"/>
         </Grid>
 
-        <Button x:Name="BtnRety" Click="BtnRetry_Click" HorizontalAlignment="Right" VerticalAlignment="Top"
+        <Button x:Name="BtnRetry" Click="BtnRetry_Click" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Content="Opnieuw" Foreground="White" Margin="5" Visibility="Collapsed"/>
 
         <TextBlock x:Name="TxtPoints" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="2" Text="8" Margin="0,-40,0,0" 
@@ -55,6 +55,5 @@
 
         <Button x:Name="BtnStart" Content="Klik hier om te starten" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
                 Foreground="White" Click="BtnStart_Click"/>
-
     </Grid>
 </Page>

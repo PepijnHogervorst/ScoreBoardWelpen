@@ -217,6 +217,7 @@ namespace ScoreBoardWelpen.Classes
                     // Fire event with the read data:
                     string data = dataReaderObject.ReadString(bytesRead);
                     DataReceived?.Invoke(this, new EventArgs());
+                    return;
                 }
             }
         }
@@ -225,7 +226,7 @@ namespace ScoreBoardWelpen.Classes
         /// CancelReadTask:
         /// - Uses the ReadCancellationTokenSource to cancel read operations
         /// </summary>
-        private void CancelReadTask()
+        public void CancelReadTask()
         {
             if (ReadCancellationTokenSource != null)
             {

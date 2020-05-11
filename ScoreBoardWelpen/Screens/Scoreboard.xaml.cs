@@ -72,6 +72,7 @@ namespace ScoreBoardWelpen.Screens
 
         private void Communication_DataReceived(object sender, EventArgs e)
         {
+            Globals.Communication.CancelReadTask();
             // When reply is received, set the points total visible,
             // Arduino is done when serial is send
             this.TxtPoints.Visibility = Visibility.Visible;
@@ -98,13 +99,12 @@ namespace ScoreBoardWelpen.Screens
             if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
             {
                 this.BtnStart.Visibility = Visibility.Visible;
-                this.BtnRety.Visibility = Visibility.Collapsed;
+                this.BtnRetry.Visibility = Visibility.Collapsed;
                 return;
             }
             Globals.GroupTurn++;
             SendPointsInfo();
         }
-        #endregion
 
         #region Button events
         private void BtnStart_Click(object sender, RoutedEventArgs e)
@@ -113,6 +113,7 @@ namespace ScoreBoardWelpen.Screens
             SendPointsInfo();
             this.BtnStart.Visibility = Visibility.Collapsed;
             this.TxtPressBtn.Visibility = Visibility.Visible;
+            this.BtnRetry.Visibility = Visibility.Visible;
         }
 
         private void BtnRetry_Click(object sender, RoutedEventArgs e)
@@ -120,6 +121,9 @@ namespace ScoreBoardWelpen.Screens
             SendPointsInfo();
         }
         #endregion
+        #endregion
+
+
 
         #region Private methods
         private void InitTimer()
