@@ -1,0 +1,208 @@
+[
+    {
+        "id": "b0da2a65.016ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "11eb7b00.170c65",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "1cceb711.470449",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "11eb7b00.170c65",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "a997bd7e.a74dd",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Add group",
+        "icon": "fa-fire",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "e3cc28ef.7096a8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Default",
+        "tab": "a997bd7e.a74dd",
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "ded92ea5.9a318",
+        "type": "comment",
+        "z": "b0da2a65.016ca8",
+        "name": "Init",
+        "info": "",
+        "x": 170,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "da91c6dc.921ec8",
+        "type": "inject",
+        "z": "b0da2a65.016ca8",
+        "name": "ts",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "bf04db0a.6f4d88",
+                "2b5d34ae.f35d3c"
+            ]
+        ]
+    },
+    {
+        "id": "ed57328d.ae1cc",
+        "type": "function",
+        "z": "b0da2a65.016ca8",
+        "name": "Read groups to globals",
+        "func": "// String to int\nvar groupNr = parseInt(msg.payload[0]);\n// return if null value\nif (isNaN(groupNr)) return;\n\nglobal.set(\"Group\" + groupNr + \"Members\", msg.payload.substring(2));\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 610,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bf04db0a.6f4d88",
+        "type": "file in",
+        "z": "b0da2a65.016ca8",
+        "name": "Read groups",
+        "filename": "C:\\Users\\Public\\Documents\\Node-Red\\Welpen-punten\\group.txt",
+        "format": "lines",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 370,
+        "y": 100,
+        "wires": [
+            [
+                "ed57328d.ae1cc",
+                "dd828731.5d9548"
+            ]
+        ]
+    },
+    {
+        "id": "2b5d34ae.f35d3c",
+        "type": "file in",
+        "z": "b0da2a65.016ca8",
+        "name": "Read points",
+        "filename": "C:\\Users\\Public\\Documents\\Node-Red\\Welpen-punten\\points.txt",
+        "format": "lines",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "x": 370,
+        "y": 140,
+        "wires": [
+            [
+                "cd811401.276e98",
+                "dd828731.5d9548"
+            ]
+        ]
+    },
+    {
+        "id": "cd811401.276e98",
+        "type": "function",
+        "z": "b0da2a65.016ca8",
+        "name": "Read files",
+        "func": "// String to int\nvar parts = msg.payload.split('|');\nif (parts.length >= 2)\n{\n    var groupNr = parseInt(parts[0]);\n    var points = parseInt(parts[1]);\n    // return if null value\n    if (isNaN(groupNr)) return;\n    if (isNaN(points)) return;\n    \n    global.set(\"Group\" + groupNr + \"Points\", points);\n}\n\n\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 560,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dd828731.5d9548",
+        "type": "debug",
+        "z": "b0da2a65.016ca8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 560,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "114c5dae.134b42",
+        "type": "inject",
+        "z": "b0da2a65.016ca8",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 180,
+        "y": 320,
+        "wires": [
+            [
+                "cb771ca7.1f7af"
+            ]
+        ]
+    },
+    {
+        "id": "cb771ca7.1f7af",
+        "type": "function",
+        "z": "b0da2a65.016ca8",
+        "name": "",
+        "func": "\nmsg.payload = global.get(\"Group2Points\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 370,
+        "y": 320,
+        "wires": [
+            [
+                "61bcb71e.eda1c8"
+            ]
+        ]
+    },
+    {
+        "id": "61bcb71e.eda1c8",
+        "type": "debug",
+        "z": "b0da2a65.016ca8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 540,
+        "y": 320,
+        "wires": []
+    }
+]
