@@ -24,5 +24,48 @@ namespace WpfScoreboard
         {
             InitializeComponent();
         }
+
+        private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void MenuToggleButton_OnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuDarkModeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LbMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsInitialized) return;
+
+            if (LbMenu.SelectedItem is ListBoxItem item)
+            {
+                switch (item.Name)
+                {
+                    case "LbItemHome":
+                        FrameMain.Navigate(new Uri("Screens/Dashboard.xaml", UriKind.Relative));
+                        break;
+
+                    case "LbItemUsers":
+                        FrameMain.Navigate(new Uri("Screens/Users.xaml", UriKind.Relative));
+                        break;
+
+                    case "LbItemConfig":
+                        FrameMain.Navigate(new Uri("Screens/Config.xaml", UriKind.Relative));
+                        break;
+
+                    default:
+                        FrameMain.Navigate(new Uri("Screens/Dashboard.xaml", UriKind.Relative));
+                        break;
+                }
+            }
+            
+        }
     }
 }
