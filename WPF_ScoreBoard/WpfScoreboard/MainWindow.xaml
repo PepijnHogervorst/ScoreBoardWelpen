@@ -13,7 +13,8 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800"
+        WindowState="Maximized">
     <materialDesign:DialogHost Identifier="RootDialog" SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">
         <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
@@ -25,14 +26,13 @@
                         Margin="16"
                         IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
 
-                    <ListBox 
-                        x:Name="LbMenu" 
-                        Margin="0 16 0 16"
-                        SelectedIndex="0"
-                        SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
-                        ItemsSource="{Binding DemoItems}"
-                        PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
-                        SelectionChanged="LbMenu_SelectionChanged">
+                    <ListBox x:Name="LbMenu" 
+                             Margin="0 16 0 16"
+                             SelectedIndex="0"
+                             SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
+                             ItemsSource="{Binding DemoItems}"
+                             PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp"
+                             SelectionChanged="LbMenu_SelectionChanged">
                         <ListBox.Resources>
                             <Style TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
                         </ListBox.Resources>

@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:WpfScoreboard.Screens"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+      Loaded="Page_Loaded" Unloaded="Page_Unloaded"
       Title="Dashboard">
 
     <Grid>
@@ -35,7 +36,7 @@
         <Button x:Name="BtnRetry" Click="BtnRetry_Click" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Content="Opnieuw" Foreground="White" Margin="5" Visibility="Collapsed"/>
 
-        <TextBlock x:Name="TxtPoints" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="2" Text="8" Margin="0,-40,0,0" 
+        <TextBlock x:Name="TxtPoints" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.RowSpan="2" Text="8" Margin="0,-40,0,0" 
                    FontSize="200" Foreground="White"/>
         <TextBlock x:Name="TxtPressBtn" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Text="Druk op de knop" TextWrapping="Wrap" 
                    FontSize="100" Foreground="White" Visibility="Collapsed"/>
