@@ -10,12 +10,23 @@ namespace WpfScoreboard.Classes
 {
     public class Storage
     {
+        #region Private properties
         private const string dbName = "storage.db";
         private static readonly string dbpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbName);
 
         private Tables.Table Groups;
         private Tables.Table Points;
         private Tables.Table Settings;
+        #endregion
+
+        #region Public properties
+        public int[]          GroupPoints   = new int[Config.NrOfGroups];
+        public List<string>[] GroupNames    = new List<String>[Config.NrOfGroups];
+        public string CommPort = String.Empty;
+        public DateTimeOffset CurrentDate = DateTimeOffset.MinValue;
+        public DateTimeOffset StartDateSummerCamp = DateTimeOffset.MinValue;
+        #endregion
+
 
         public enum TableSelect
         {
@@ -38,6 +49,12 @@ namespace WpfScoreboard.Classes
             Settings.AddColumn(new Tables.Column("Value", typeof(string), true, true));
 
             InitializeDatabase();
+
+            // Init properties
+            for (int i = 0; i < GroupNames.Length; i++)
+            {
+                GroupNames[i] = new List<string>();
+            }
         }
 
         public void InitializeDatabase()
@@ -189,7 +206,7 @@ namespace WpfScoreboard.Classes
             List<Points> entries = new List<Points>();
             Points entrie = new Points();
 
-            if (string.IsNullOrEmpty(columnFilter))
+            if (String.IsNullOrEmpty(columnFilter))
             {
                 columnFilter = "*";
             }
@@ -225,7 +242,8 @@ namespace WpfScoreboard.Classes
         public struct SettingNames
         {
             public const string StartDateSummerCamp = "StartDateSummerCamp";
-            public const string CurrentDate = "CurrentDate";
+            public const string CurrentDate         = "CurrentDate";
+            public const string ComPort             = "CommPort";
         }
 
         public void SettingsReplace(string settingName, string value)
@@ -279,6 +297,67 @@ namespace WpfScoreboard.Classes
                 db.Close();
             }
             return entries;
+        }
+        #endregion
+
+        #region Public methods
+        /// <summary>
+        /// Retrieve points / groups and settings from database
+        /// save data to public properties in this class
+        /// </summary>
+        public void RetrieveData()
+        {
+            // Points 
+            List<Points> pointsEntries = this.GetPoints("*");
+            if (pointsEntries != null)
+            {
+                foreach (Points points in pointsEntries)
+                {
+                    GroupPoints[points.GroupNr] = points.GroupPoints;
+                }
+            }
+
+            // Group names
+            List<Groups> grpEntries = this.GetGroups("*");
+            if (grpEntries != null)
+            {
+                foreach (Groups groups in grpEntries)
+                {
+                    GroupNames[groups.GroupNr - 1].Add(groups.Name);
+                }
+            }
+
+            // Settings
+            List<Setting> settingEntries = this.SettingsGet("*");
+            if (settingEntries != null)
+            {
+                foreach (Setting setting in settingEntries)
+                {
+                    this.UpdateSetting(setting);
+                }
+            }
+
+            // Check settings and set default if needed
+        }
+        #endregion
+
+        #region Private methods
+        private void UpdateSetting(Setting setting)
+        {
+            switch (setting.Name)
+            {
+                case SettingNames.ComPort:
+                    CommPort = setting.Value;
+                    break;
+                case SettingNames.CurrentDate:
+                    CurrentDate = DateTimeOffset.Parse(setting.Value);
+                    break;
+                case SettingNames.StartDateSummerCamp:
+                    StartDateSummerCamp = DateTimeOffset.Parse(setting.Value);
+                    break;
+                default:
+                    break;
+            }
         }
         #endregion
     }

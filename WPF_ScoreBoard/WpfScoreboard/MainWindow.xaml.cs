@@ -20,10 +20,27 @@ namespace WpfScoreboard
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Constructor
         public MainWindow()
         {
             InitializeComponent();
         }
+        #endregion
+
+        #region Screen event methods
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Get settings and group points from database
+            Globals.Storage.RetrieveData();
+        }
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+
 
         private void UIElement_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -31,11 +48,6 @@ namespace WpfScoreboard
         }
 
         private void MenuToggleButton_OnClick(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void MenuDarkModeButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -67,5 +79,7 @@ namespace WpfScoreboard
             }
             
         }
+
+        
     }
 }

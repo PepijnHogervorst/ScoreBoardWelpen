@@ -24,5 +24,15 @@ namespace WpfScoreboard.Screens
         {
             InitializeComponent();
         }
+
+        private void TxtBoxGroup_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void BtnResetGroupStart_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
