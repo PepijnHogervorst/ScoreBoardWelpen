@@ -75,7 +75,20 @@ namespace WpfScoreboard.Screens
         {
             // When reply is received, set the points total visible,
             // Arduino is done when serial is send
-            this.TxtPoints.Visibility = Visibility.Visible;
+            Dispatcher.Invoke(() =>
+            {
+                this.TxtPoints.Visibility = Visibility.Visible;
+                this.TxtPressBtn.Visibility = Visibility.Collapsed;
+            });
+
+            // Start timer to show new group after x seconds
+            timer.Start();
+        }
+
+        private void Timer_Tick(object sender, object e)
+        {
+            timer.Stop();
+            // Update group turn count
             if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
             {
                 Globals.GroupTurn = 1;
@@ -84,36 +97,38 @@ namespace WpfScoreboard.Screens
             {
                 Globals.GroupTurn++;
             }
-            // Start timer to show new group after x seconds
-            timer.Start();
-        }
-
-        private void Timer_Tick(object sender, object e)
-        {
-            timer.Stop();
+            // Display the person that is on that team
             displayPerson();
             this.TxtPressBtn.Visibility = Visibility.Visible;
 
             // Update group and send info to arduino
-            if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
+            if (Globals.GroupTurn > Globals.MaxNrOfGroups)
             {
                 this.BtnStart.Visibility = Visibility.Visible;
                 this.BtnRetry.Visibility = Visibility.Collapsed;
+                this.TxtPressBtn.Text = "Succes met punten verdienen!";
                 return;
             }
-            Globals.GroupTurn++;
             SendPointsInfo();
         }
 
         #region Button events
         private void BtnRetry_Click(object sender, RoutedEventArgs e)
         {
-
+            SendPointsInfo();
         }
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-
+            Globals.GroupTurn = 1;
+            // Clear LEDS
+            Globals.Communication.ClearLEDs();
+            
+            SendPointsInfo();
+            this.BtnStart.Visibility = Visibility.Collapsed;
+            this.TxtPressBtn.Visibility = Visibility.Visible;
+            this.BtnRetry.Visibility = Visibility.Visible;
+            this.TxtPressBtn.Text = "Druk op de knop!";
         }
 
 
@@ -130,7 +145,7 @@ namespace WpfScoreboard.Screens
         {
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
-            timer.Interval = TimeSpan.FromSeconds(5);
+            timer.Interval = TimeSpan.FromSeconds(7);
             timer.Stop();
         }
 
@@ -235,10 +250,6 @@ namespace WpfScoreboard.Screens
             Globals.Communication.SetLeds(Globals.GroupTurn, pointsToWrite);
             this.TxtPoints.Visibility = Visibility.Collapsed;
             this.TxtPoints.Text = pointsToWrite.ToString();
-
-            //Disable the button 
-            this.TxtPressBtn.Visibility = Visibility.Collapsed;
-            this.TxtPoints.Visibility = Visibility.Collapsed;
         }
         #endregion
 

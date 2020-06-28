@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace WpfScoreboard.Classes
 {
@@ -23,6 +25,7 @@ namespace WpfScoreboard.Classes
 
         #region Private properties
         private SerialPort serialPort = null;
+        private DispatcherTimer ListenTimer = null;
         #endregion
 
         #region Public properties
@@ -35,38 +38,73 @@ namespace WpfScoreboard.Classes
         #region Constructor
         public Communication()
         {
-            OpenSerialPort();
+            
         }
         #endregion
 
         #region Public methods
-        public void OpenSerialPort()
+        public bool OpenSerialPort()
         {
+            // Get port from database
+            string port = Globals.Storage.GetCommPort();
+
+            if (port == null)
+            {
+                // Get port that is available
+                string[] ports = SerialPort.GetPortNames();
+                if (ports.Length > 0)
+                {
+                    port = ports[0];
+                    Globals.Storage.SettingsReplace(SettingNames.ComPort, port);
+                }
+                else
+                {
+                    return false;
+                }
+            }
             try
             {
-                
+                serialPort = new SerialPort(port);
+                serialPort.BaudRate = 9600;
+                serialPort.Parity = Parity.None;
+                serialPort.DataBits = 8;
+                serialPort.StopBits = StopBits.One;
+                serialPort.DataReceived += SerialPort_DataReceived;
+                serialPort.Open();
             }
-            catch //(Exception ex)
+            catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message, "Error opening COM port");
+                return false;
             }
+            return true;
         }
 
         public void SetLeds(int group, int points)
         {
-            string ledMessage = string.Empty;
+            string ledMessage;
             ledMessage = 'g' + group.ToString() + 'p' + points.ToString("D3");
             WriteSerial(ledMessage);
-            // Start task to listen to incoming reply from arduino
-            // Arduino sends DONE when leds are set!
-            
+        }
+
+        public void ClearLEDs()
+        {
+            string msg = "c00000";
+            WriteSerial(msg);
         }
 
         public void WriteSerial(string message)
         {
+            if (serialPort == null)
+            {
+                OpenSerialPort();
+            }
             if (serialPort != null && message != null)
             {
-                // Write message over serial port
+                if (serialPort.IsOpen)
+                {
+                    serialPort.Write(message);
+                }
             }
         }
 
@@ -79,14 +117,22 @@ namespace WpfScoreboard.Classes
         {
             if (serialPort != null)
             {
-                serialPort.Dispose();
+                try
+                {
+                    serialPort.Close();
+                    serialPort.Dispose();
+                }
+                catch {}
+                serialPort = null;
             }
-            serialPort = null;
         }
         #endregion
 
         #region Private methods
-        
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            this.DataReceived?.Invoke(this, new EventArgs());
+        }
         #endregion
     }
 }
