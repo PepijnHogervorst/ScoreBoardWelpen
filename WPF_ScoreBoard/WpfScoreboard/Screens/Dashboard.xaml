@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfScoreboard.Screens"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1080" d:DesignWidth="1920"
       Loaded="Page_Loaded" Unloaded="Page_Unloaded"
       Title="Dashboard">
 
@@ -32,7 +32,56 @@
             <Rectangle Fill="#FF00C301" Grid.Column="4"/>
             <Rectangle Fill="#FF00AB08" Grid.Column="5"/>
         </Grid>
-
+        
+        <!--#region Overview -->
+        <StackPanel x:Name="SpOverview" Orientation="Horizontal"
+                    Grid.Row="0" Grid.Column="0" 
+                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="1" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp1" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="2" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp2" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="3" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp3" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="4" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp4" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="5" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp5" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="6" FontSize="40" Foreground="White"
+                           TextAlignment="Center"/>
+                <TextBlock x:Name="TxtOverviewGrp6" Text="Points"
+                           FontSize="50" Foreground="White"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+        <!--#endregion-->
+        
         <Button x:Name="BtnRetry" Click="BtnRetry_Click" HorizontalAlignment="Right" VerticalAlignment="Top"
                 Content="Opnieuw" Foreground="White" Margin="5" Visibility="Collapsed"/>
 
@@ -40,17 +89,24 @@
                    FontSize="200" Foreground="White"/>
         <TextBlock x:Name="TxtPressBtn" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Text="Druk op de knop" TextWrapping="Wrap" 
                    FontSize="100" Foreground="White" Visibility="Collapsed"/>
-        <TextBlock x:Name="TxtName" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Text="Naam" TextWrapping="Wrap" 
-                   FontSize="70" Foreground="White" Margin="30,0,0,0"/>
-
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right">
-            <TextBlock x:Name="TxtGroupTxt" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="Groepje:" TextWrapping="Wrap" 
+        
+        <!-- ROW 2 -->
+        <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,50,0,0">
+            <TextBlock x:Name="TxtName" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Text="Naam" TextWrapping="Wrap" 
+                   FontSize="100" Foreground="White" Margin="0,0,0,0"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+                <TextBlock x:Name="TxtGroupTxt" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="Groepje:" TextWrapping="Wrap" 
                    FontSize="70" Foreground="White" Margin="0,0,10,0"/>
-            <TextBlock x:Name="TxtGroup" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="1" TextWrapping="Wrap" 
-                   FontSize="80" Foreground="White" Margin="0,0,30,0"/>
+                <TextBlock x:Name="TxtGroup" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="2" Text="1" TextWrapping="Wrap" 
+                   FontSize="80" Foreground="White" Margin="0,0,0,0"/>
+            </StackPanel>
         </StackPanel>
+        
+
+        
 
         <Button x:Name="BtnStart" Content="Klik hier om te starten" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Top"
-                Foreground="White" Click="BtnStart_Click" Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                Foreground="White" Click="BtnStart_Click" Style="{StaticResource MaterialDesignOutlinedButton}"
+                FontSize="22" Height="50"/>
     </Grid>
 </Page>

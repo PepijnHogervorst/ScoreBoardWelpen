@@ -51,7 +51,7 @@ namespace WpfScoreboard.Screens
 
             // Set UI elements
             this.TxtPoints.Visibility = Visibility.Collapsed;
-
+            this.SpOverview.Visibility = Visibility.Collapsed;
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -91,24 +91,41 @@ namespace WpfScoreboard.Screens
             // Update group turn count
             if (Globals.GroupTurn >= Globals.MaxNrOfGroups)
             {
+                this.TxtPoints.Visibility = Visibility.Hidden;
+                this.BtnStart.Visibility = Visibility.Visible;
+                this.BtnRetry.Visibility = Visibility.Collapsed;
+                this.TxtPressBtn.Visibility = Visibility.Visible;
+                this.TxtGroup.Visibility = Visibility.Collapsed;
+                this.TxtName.Visibility = Visibility.Collapsed;
+                this.TxtGroupTxt.Visibility = Visibility.Collapsed;
+
+                TimeSpan difference = currentDate - startSummerCamp;
+                int days_diff = (difference.TotalDays > 0 ?
+                    (int)Math.Floor(difference.TotalDays) : (int)Math.Ceiling(difference.TotalDays));
+                // If the week is over (friday night, 6 days done) show a text who won
+                if (days_diff >= 6)
+                {
+                    this.TxtPressBtn.Text = ShowWinner();
+                }
+                else
+                {
+                    this.TxtPressBtn.Text = "Succes met punten verdienen!";
+                }
+                
                 Globals.GroupTurn = 1;
+                // Toggle overview points 
+                ShowPointsOverview();
+                return;
             }
             else
             {
                 Globals.GroupTurn++;
             }
+
             // Display the person that is on that team
             displayPerson();
             this.TxtPressBtn.Visibility = Visibility.Visible;
-
             // Update group and send info to arduino
-            if (Globals.GroupTurn > Globals.MaxNrOfGroups)
-            {
-                this.BtnStart.Visibility = Visibility.Visible;
-                this.BtnRetry.Visibility = Visibility.Collapsed;
-                this.TxtPressBtn.Text = "Succes met punten verdienen!";
-                return;
-            }
             SendPointsInfo();
         }
 
@@ -118,16 +135,20 @@ namespace WpfScoreboard.Screens
             SendPointsInfo();
         }
 
-        private void BtnStart_Click(object sender, RoutedEventArgs e)
+        private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             Globals.GroupTurn = 1;
             // Clear LEDS
             Globals.Communication.ClearLEDs();
-            
+
+            await Task.Delay(1000);
+
+            displayPerson();
             SendPointsInfo();
             this.BtnStart.Visibility = Visibility.Collapsed;
             this.TxtPressBtn.Visibility = Visibility.Visible;
             this.BtnRetry.Visibility = Visibility.Visible;
+            this.SpOverview.Visibility = Visibility.Collapsed;
             this.TxtPressBtn.Text = "Druk op de knop!";
         }
 
@@ -151,6 +172,10 @@ namespace WpfScoreboard.Screens
 
         private void displayPerson()
         {
+            this.TxtGroupTxt.Visibility = Visibility.Visible;
+            this.TxtGroup.Visibility = Visibility.Visible;
+            this.TxtName.Visibility = Visibility.Visible;
+
             // Update group nr text
             this.TxtGroup.Text = Globals.GroupTurn.ToString();
 
@@ -175,6 +200,7 @@ namespace WpfScoreboard.Screens
                 return;
             }
             int offset = days_diff % myGroup.Count;
+
 
             this.TxtName.Text = myGroup[offset].Name;
 
@@ -250,6 +276,58 @@ namespace WpfScoreboard.Screens
             Globals.Communication.SetLeds(Globals.GroupTurn, pointsToWrite);
             this.TxtPoints.Visibility = Visibility.Collapsed;
             this.TxtPoints.Text = pointsToWrite.ToString();
+        }
+
+        private void ShowPointsOverview()
+        {
+            // Set points
+            foreach (Classes.Points groupPoints in points)
+            {
+                switch (groupPoints.GroupNr)
+                {
+                    case 1:
+                        this.TxtOverviewGrp1.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    case 2:
+                        this.TxtOverviewGrp2.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    case 3:
+                        this.TxtOverviewGrp3.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    case 4:
+                        this.TxtOverviewGrp4.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    case 5:
+                        this.TxtOverviewGrp5.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    case 6:
+                        this.TxtOverviewGrp6.Text = groupPoints.GroupPoints.ToString("D2");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Set UI object visible
+            this.SpOverview.Visibility = Visibility.Visible;
+        }
+
+        private string ShowWinner()
+        {
+            string retVal = "Gefeliciteerd groepje ";
+            Classes.Points highestPoints = new Classes.Points();
+            highestPoints.GroupPoints = 0;
+            // Loop through all groups to get points
+            foreach (Classes.Points groupPoints in points)
+            {
+                if (groupPoints.GroupPoints > highestPoints.GroupPoints)
+                {
+                    highestPoints = groupPoints;
+                }
+            }
+
+            retVal += highestPoints.GroupNr + "!!!";
+
+            return retVal;
         }
         #endregion
 

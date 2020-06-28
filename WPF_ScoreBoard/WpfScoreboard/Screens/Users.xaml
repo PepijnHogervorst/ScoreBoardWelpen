@@ -58,7 +58,7 @@
                        FontSize="20" Foreground="White" FontWeight="Bold" FontStyle="Italic"/>
 
         </Grid>
-        <materialDesign:Card Grid.Row="2" HorizontalAlignment="Left" Background="#80565656" Margin="5">
+        <materialDesign:Card Grid.Row="2" HorizontalAlignment="Left" Background="#80565656" Margin="5" MaxHeight="100">
             <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Center">
                 <TextBox MaxHeight="60" x:Name="TbNewPerson" FontSize="20" InputScope="Default"
                          Margin="5" TextChanged="TbNewPerson_TextChanged" GotFocus="TbNewPerson_GotFocus" LostFocus="TbNewPerson_LostFocus" 

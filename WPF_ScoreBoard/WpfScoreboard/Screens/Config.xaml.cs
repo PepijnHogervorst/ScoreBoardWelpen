@@ -80,7 +80,7 @@ namespace WpfScoreboard.Screens
                     return;
                 }
                 Globals.Storage.StartDateSummerCamp = DateTime.SpecifyKind(picker.SelectedDate.GetValueOrDefault(), DateTimeKind.Utc);
-                Globals.Storage.SettingsReplace(Classes.SettingNames.StartDateSummerCamp, Globals.Storage.StartDateSummerCamp.ToString());
+                Globals.Storage.SettingsReplace(Classes.SettingNames.StartDateSummerCamp, Globals.Storage.StartDateSummerCamp.ToString("d"));
             }
         }
 
@@ -93,7 +93,7 @@ namespace WpfScoreboard.Screens
                     return;
                 }
                 Globals.Storage.CurrentDate = DateTime.SpecifyKind(picker.SelectedDate.GetValueOrDefault(), DateTimeKind.Utc);
-                Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, Globals.Storage.CurrentDate.ToString());
+                Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, Globals.Storage.CurrentDate.ToString("D"));
             }
         }
         #endregion
