@@ -182,8 +182,14 @@ namespace ScoreBoardWelpen.Classes
                 // Cleanup once complete
                 if (dataReaderObject != null)
                 {
-                    dataReaderObject.DetachStream();
-                    dataReaderObject = null;
+                    try
+                    {
+                        dataReaderObject.DetachStream();
+                        dataReaderObject = null;
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
