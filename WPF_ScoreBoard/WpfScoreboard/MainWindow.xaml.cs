@@ -32,6 +32,10 @@ namespace WpfScoreboard
         {
             // Get settings and group points from database
             Globals.Storage.RetrieveData();
+
+            // Set date to current date on pc
+            Globals.Storage.CurrentDate = DateTimeOffset.Now;
+            Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, DateTimeOffset.Now.ToString());
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)

@@ -8,6 +8,13 @@ using System.IO;
 
 namespace WpfScoreboard.Classes
 {
+    public struct SettingNames
+    {
+        public const string StartDateSummerCamp = "StartDateSummerCamp";
+        public const string CurrentDate = "CurrentDate";
+        public const string ComPort = "CommPort";
+    }
+
     public class Storage
     {
         #region Private properties
@@ -238,14 +245,36 @@ namespace WpfScoreboard.Classes
         }
         #endregion
 
-        #region Settings methods
-        public struct SettingNames
+        #region Comm port methods
+        public string GetCommPort()
         {
-            public const string StartDateSummerCamp = "StartDateSummerCamp";
-            public const string CurrentDate         = "CurrentDate";
-            public const string ComPort             = "CommPort";
-        }
+            string port;
+            Setting setting = SettingGet(SettingNames.ComPort);
+            if (setting == null)
+            {
+                // Replace data with new comm port 
+                string[] ports = System.IO.Ports.SerialPort.GetPortNames();
 
+                if (ports.Length > 0)
+                {
+                    port = ports[0];
+                    this.SettingsReplace(SettingNames.ComPort, port);
+                }
+                else
+                {
+                    port = "";
+                }
+            }
+            else
+            {
+                port = setting.Value;
+            }
+
+            return port;
+        }
+        #endregion
+
+        #region Settings methods
         public void SettingsReplace(string settingName, string value)
         {
             using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
@@ -298,6 +327,34 @@ namespace WpfScoreboard.Classes
             }
             return entries;
         }
+
+        public Setting SettingGet(string settingName)
+        {
+            Setting entrie = null;
+            using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
+            {
+                db.Open();
+
+                using (SqliteCommand cmd = new SqliteCommand())
+                {
+                    cmd.Connection = db;
+                    cmd.CommandText = Settings.SelectCommand("*", $"Name IS \"{settingName}\"");
+
+                    using (SqliteDataReader query = cmd.ExecuteReader())
+                    {
+                        if (query.Read())
+                        {
+                            entrie = new Setting();
+                            entrie.Name = query.GetString(1);
+                            entrie.Value = query.GetString(2);
+                        }
+                    }
+                    cmd.ExecuteReader();
+                }
+                db.Close();
+            }
+            return entrie;
+        }
         #endregion
 
         #region Public methods
@@ -313,7 +370,7 @@ namespace WpfScoreboard.Classes
             {
                 foreach (Points points in pointsEntries)
                 {
-                    GroupPoints[points.GroupNr] = points.GroupPoints;
+                    GroupPoints[points.GroupNr - 1] = points.GroupPoints;
                 }
             }
 

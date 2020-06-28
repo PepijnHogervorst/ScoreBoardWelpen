@@ -85,7 +85,7 @@
                             IsChecked="False"
                             Click="MenuToggleButton_OnClick"/>
                         
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32">Welpen Scorebord!</TextBlock>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32">Welpen scorebord!</TextBlock>
                     </DockPanel>
                 </materialDesign:ColorZone>
                 <Grid>

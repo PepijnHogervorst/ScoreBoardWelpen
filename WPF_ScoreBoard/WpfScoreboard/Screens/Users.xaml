@@ -69,7 +69,7 @@
                 <TextBox MaxHeight="60" x:Name="TbGroup"  FontSize="20" InputScope="Number" MaxLength="1"
                          Margin="5" TextChanged="TbGroup_TextChanged" GotFocus="TbGroup_GotFocus" LostFocus="TbGroup_LostFocus" 
                          MinWidth="40" PreviewTextInput="TbGroup_PreviewTextInput"
-                         materialDesign:HintAssist.Hint="Grp"
+                         materialDesign:HintAssist.Hint="Groep"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                 <Button x:Name="BtnNewPerson" Click="BtnNewPerson_Click" FontSize="20" MinWidth="50"
                         Foreground="White" Margin="5,0">

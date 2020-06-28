@@ -170,11 +170,11 @@ namespace WpfScoreboard.Screens
             List<Classes.Setting> settings = Globals.Storage.SettingsGet("*");
             foreach (Classes.Setting setting in settings)
             {
-                if (setting.Name == Classes.Storage.SettingNames.StartDateSummerCamp)
+                if (setting.Name == Classes.SettingNames.StartDateSummerCamp)
                 {
                     startSummerCamp = DateTimeOffset.Parse(setting.Value);
                 }
-                else if (setting.Name == Classes.Storage.SettingNames.CurrentDate)
+                else if (setting.Name == Classes.SettingNames.CurrentDate)
                 {
                     currentDate = DateTimeOffset.Parse(setting.Value);
                 }
