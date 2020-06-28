@@ -25,7 +25,6 @@ namespace WpfScoreboard.Classes
 
         #region Private properties
         private SerialPort serialPort = null;
-        private DispatcherTimer ListenTimer = null;
         #endregion
 
         #region Public properties
