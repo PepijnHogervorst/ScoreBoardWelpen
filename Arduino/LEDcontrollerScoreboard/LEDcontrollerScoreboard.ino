@@ -70,6 +70,7 @@ bool messageReceived = false;
 bool IsPartyMode = false;
 bool IsArcadeBtnEnabled = false;
 unsigned long prevEventTime = 0;
+uint8_t PartyProgram = 0;
 
 int GroupNr = 0;
 int Points = 0;
@@ -270,7 +271,6 @@ void DeciferMessage()
 
       // Enable the button, when pressed write ledstrip
       EnableArcadeButton();
-      //WriteLedStrip();
       break;
     case 'b':
       // Led program
@@ -280,6 +280,13 @@ void DeciferMessage()
       // Pary mode!
       IsPartyMode = true;
       Serial.println("Party is on!");
+      // Get program number 
+      uint8_t program = inputString.charAt(1) - '0';
+      if (program >= 0 && program < 9)
+      {
+        PartyProgram = program;
+      }
+      
       break;
     case 's':
       IsPartyMode = false;
