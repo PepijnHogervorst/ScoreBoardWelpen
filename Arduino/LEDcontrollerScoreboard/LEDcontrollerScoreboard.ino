@@ -109,8 +109,11 @@ int groupNrToPin(int nr);
 int groupNrToOffset(int nr);
 uint32_t Wheel(byte WheelPos);
 void DebugLoop(void);
-void PartyLoop(void);
 void ClearLEDstrips(void);
+// Party prototypes
+void PartyLoop(void);
+void PP_Full_rainbow(void);
+void PP_Random_Rain(void);
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -222,8 +225,8 @@ void loop() {
 void serialEvent1() 
 {
   unsigned long currentTime = millis();
-  if ((currentTime - prevEventTime) > 500 ||
-     (((prevEventTime + 500) > currentTime) && prevEventTime > currentTime))
+  if ((currentTime - prevEventTime) > 750 ||
+     (((prevEventTime + 750) > currentTime) && prevEventTime > currentTime))
   {
     inputString = "";
     Serial.println("Purged serial input buffer");
@@ -272,10 +275,12 @@ void DeciferMessage()
       // Enable the button, when pressed write ledstrip
       EnableArcadeButton();
       break;
+
     case 'b':
       // Led program
       SetLEDBrightness();
       break;
+
     case 'p':
       // Pary mode!
       IsPartyMode = true;
@@ -284,15 +289,24 @@ void DeciferMessage()
       uint8_t program = inputString.charAt(1) - '0';
       if (program >= 0 && program < 9)
       {
-        PartyProgram = program;
+        if (program != PartyProgram)
+        {
+          ClearLEDstrips();
+          PartyProgram = program;
+        }
       }
-      
       break;
+
     case 's':
       IsPartyMode = false;
       Serial.println("Party canceled..");
       ClearLEDstrips();
       break;
+    
+    case 'S': 
+      // Strobe value
+      break;
+
     case 'c':
       Serial.println("Clearing ledstrips");
       if (IsPartyMode)
@@ -472,7 +486,56 @@ void DebugLoop(void)
   groupCounter++;
 }
 
+
+
+int groupNrToOffset(int nr)
+{
+  int pin = 0;
+  switch(nr)
+  {
+    case 1: pin = LED_OFFSET_1; break;
+    case 2: pin = LED_OFFSET_2; break;
+    case 3: pin = LED_OFFSET_3; break;
+    case 4: pin = LED_OFFSET_4; break;
+    case 5: pin = LED_OFFSET_5; break;
+    case 6: pin = LED_OFFSET_6; break;
+  }
+
+  return pin;
+}
+
+void ClearLEDstrips()
+{
+  int pin = 0;
+  for (int i = 1; i <= NUM_OF_GROUPS; i++)
+  {
+    pin = groupNrToPin(i);
+    led_strip.setPin(pin);
+    led_strip.clear();
+    led_strip.show();
+  }
+}
+
+#pragma region PARTY PROGRAM FUNCTIONS
 void PartyLoop(void)
+{
+  switch (PartyProgram)
+  {
+  case 0:
+    PP_Full_Rainbow();
+    break;
+  
+  case 1:
+    PP_Random_Rain();
+    break;
+
+  default:
+    break;
+  }
+  
+}
+
+void PP_Full_Rainbow(void)
 {
   static uint16_t colorOffset = 0; 
   int ledPin = 0;
@@ -504,33 +567,11 @@ void PartyLoop(void)
   colorOffset++;
 }
 
-int groupNrToOffset(int nr)
+void PP_Random_Rain(void)
 {
-  int pin = 0;
-  switch(nr)
-  {
-    case 1: pin = LED_OFFSET_1; break;
-    case 2: pin = LED_OFFSET_2; break;
-    case 3: pin = LED_OFFSET_3; break;
-    case 4: pin = LED_OFFSET_4; break;
-    case 5: pin = LED_OFFSET_5; break;
-    case 6: pin = LED_OFFSET_6; break;
-  }
 
-  return pin;
 }
-
-void ClearLEDstrips()
-{
-  int pin = 0;
-  for (int i = 1; i <= NUM_OF_GROUPS; i++)
-  {
-    pin = groupNrToPin(i);
-    led_strip.setPin(pin);
-    led_strip.clear();
-    led_strip.show();
-  }
-}
+#pragma endregion
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
