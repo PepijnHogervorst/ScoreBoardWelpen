@@ -1,0 +1,132 @@
+﻿<Page x:Class="WpfScoreboard.Screens.Party"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfScoreboard.Screens"
+      xmlns:materialdesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d" 
+      d:DesignHeight="1080" d:DesignWidth="1920"
+      Loaded="Page_Loaded" Unloaded="Page_Unloaded"
+      Title="Party">
+
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Images/bgGold.jpg" Stretch="UniformToFill"/>
+        </Grid.Background>
+        
+        <Grid VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <materialdesign:Card x:Name="Card1"
+                                 Grid.Row="0" Grid.Column="0"
+                                 MinHeight="50" MinWidth="300"
+                                 VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <TextBlock Text="Light settings" Margin="5,10"
+                               Foreground="Gold" FontSize="15"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Brightness" Margin="10,35,5,5"
+                                   Foreground="White" FontSize="14"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Grid.Column="0"/>
+                        <Slider x:Name="SliderBrightness" Minimum="0" Maximum="100"
+                                Width="200"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                ToolTip="MaterialDesignDiscreteSlider"
+                                Margin="5"
+                                Grid.Column="1" HorizontalAlignment="Right"
+                                Value="50"
+                                Thumb.DragCompleted="SliderBrightness_DragCompleted"/>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Strobe speed" Margin="10,35,5,5"
+                                   Foreground="White" FontSize="14"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Grid.Column="0"/>
+                        <Slider x:Name="SliderStrobe" Minimum="0" Maximum="100"
+                                Width="200"
+                                Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                ToolTip="MaterialDesignDiscreteSlider"
+                                Margin="5"
+                                Grid.Column="1" HorizontalAlignment="Right"
+                                Thumb.DragCompleted="SliderStrobe_DragCompleted"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Strobe speed" Margin="10,25,5,25"
+                                   Foreground="White" FontSize="14"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Grid.Column="0"/>
+                        <Button x:Name="BtnStrobe" Content="Strobe"
+                                Width="100"
+                                Margin="5"
+                                Grid.Column="1" HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </materialdesign:Card>
+
+            <materialdesign:Card x:Name="Card2"
+                                 Grid.Row="0" Grid.Column="2"
+                                 MinHeight="50" MinWidth="300"
+                                 VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <TextBlock Text="Party program" Margin="5,10"
+                               Foreground="Gold" FontSize="17"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Full rainbow" Margin="10,20"
+                                   Foreground="White" FontSize="16"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Grid.Column="0"/>
+                        <RadioButton x:Name="RbFullRainbow" Margin="10, 20"
+                                     Style="{StaticResource MaterialDesignRadioButton}"
+                                     Grid.Column="1" HorizontalAlignment="Right"
+                                     GroupName="PartyProgram" Click="RbFullRainbow_Click"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="210"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Random rain" Margin="10,20"
+                                   Foreground="White" FontSize="16"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Grid.Column="0"/>
+                        <RadioButton x:Name="RbRain" Margin="10, 20"
+                                     Style="{StaticResource MaterialDesignRadioButton}"
+                                     Grid.Column="1" HorizontalAlignment="Right" 
+                                     GroupName="PartyProgram" Click="RbRain_Click"/>
+                    </Grid>
+                </StackPanel>
+            </materialdesign:Card>
+        </Grid>
+    </Grid>
+</Page>

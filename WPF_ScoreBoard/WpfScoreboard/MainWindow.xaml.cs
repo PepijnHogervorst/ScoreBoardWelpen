@@ -40,7 +40,7 @@ namespace WpfScoreboard
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-
+            Globals.Communication.CloseDevice();
         }
         #endregion
 
@@ -76,10 +76,16 @@ namespace WpfScoreboard
                         FrameMain.Navigate(new Uri("Screens/Config.xaml", UriKind.Relative));
                         break;
 
+                    case "LbItemParty":
+                        FrameMain.Navigate(new Uri("Screens/Party.xaml", UriKind.Relative));
+                        break;
+
                     default:
                         FrameMain.Navigate(new Uri("Screens/Dashboard.xaml", UriKind.Relative));
                         break;
                 }
+
+                DrawerMenuLeft.IsLeftDrawerOpen = false;
             }
             
         }

@@ -17,7 +17,7 @@
         WindowState="Maximized"
         Loaded="Window_Loaded" Unloaded="Window_Unloaded">
     <materialDesign:DialogHost Identifier="RootDialog" SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">
-        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+        <materialDesign:DrawerHost x:Name="DrawerMenuLeft" IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
             <materialDesign:DrawerHost.LeftDrawerContent>
                 <DockPanel MinWidth="220">
                     <ToggleButton 
@@ -67,6 +67,15 @@
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Settings" Margin="5,0"/>
                                 <TextBlock Text="Instellingen"
+                                           Margin="5,0"
+                                           FontSize="16"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem x:Name="LbItemParty">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="PartyPopper" Margin="5,0"/>
+                                <TextBlock Text="Party!"
                                            Margin="5,0"
                                            FontSize="16"/>
                             </StackPanel>
