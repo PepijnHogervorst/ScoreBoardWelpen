@@ -20,6 +20,16 @@ namespace WpfScoreboard.Screens
     /// </summary>
     public partial class Party : Page
     {
+        
+        public enum PartyProgram
+        {
+            FullRainbow = 0,
+            RandomRain,
+            ColorWipe,
+        }
+
+        private PartyProgram ActiveProgram = PartyProgram.FullRainbow;
+
         public Party()
         {
             InitializeComponent();
@@ -40,12 +50,17 @@ namespace WpfScoreboard.Screens
         #region Radio button event methods
         private void RbFullRainbow_Click(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.WriteSerial("p00000");
+            SetPartyProgram(PartyProgram.FullRainbow);
         }
 
         private void RbRain_Click(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.WriteSerial("p10000");
+            SetPartyProgram(PartyProgram.RandomRain);
+        }
+
+        private void RbColorWipe_Click(object sender, RoutedEventArgs e)
+        {
+            SetPartyProgram(PartyProgram.ColorWipe);
         }
         #endregion
 
@@ -72,6 +87,22 @@ namespace WpfScoreboard.Screens
             string value = ((int)SliderStrobe.Value).ToString("D3");
             // Write value to controller
             Globals.Communication.WriteSerial($"Sxx{value}");
+        }
+
+        private void SliderSpeed_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            // Check what program is selected and send that with the new speed to arduino
+            SetPartyProgram(ActiveProgram);
+        }
+        #endregion
+
+        #region Private methods
+        private void SetPartyProgram(PartyProgram program)
+        {
+            string msg = "p" + ((int)program).ToString("D1") + ((int)SliderSpeed.Value).ToString("D2");
+            msg = msg.PadRight(6, '0');
+            Globals.Communication.WriteSerial(msg);
+            ActiveProgram = program;
         }
         #endregion
 

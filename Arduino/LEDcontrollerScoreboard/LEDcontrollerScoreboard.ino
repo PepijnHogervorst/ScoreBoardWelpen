@@ -69,14 +69,24 @@ String ledMsg = "";
 bool messageReceived = false;
 bool IsPartyMode = false;
 bool IsArcadeBtnEnabled = false;
+bool PartyProgramChanged = true;
 unsigned long prevEventTime = 0;
 uint8_t PartyProgram = 0;
+uint8_t PartyDelayTime = 5;
 
 int GroupNr = 0;
 int Points = 0;
 
 const char SoftwareVersion[] = "V0.1";
 const char compile_date[] = __DATE__ " " __TIME__;
+const uint32_t MY_COLORS[] = {
+  led_strip.Color(0, 255, 0),
+  led_strip.Color(255, 0, 0),
+  led_strip.Color(0, 0, 255),
+  led_strip.Color(255, 255, 0),
+  led_strip.Color(0, 255, 255),
+  led_strip.Color(255, 0, 255)
+};
 
 // Lookup table 
 byte neopix_gamma[] = {
@@ -114,6 +124,9 @@ void ClearLEDstrips(void);
 void PartyLoop(void);
 void PP_Full_rainbow(void);
 void PP_Random_Rain(void);
+void PP_ColorWipes(void);
+
+void ColorWipe(uint32_t color, int delayTime);
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -284,15 +297,25 @@ void DeciferMessage()
     case 'p':
       // Pary mode!
       IsPartyMode = true;
-      Serial.println("Party is on!");
       // Get program number 
       uint8_t program = inputString.charAt(1) - '0';
+      // Get party speed (delay time in ms)
+      String BufPartyTime = inputString.substring(2, 4); 
+      PartyDelayTime = BufPartyTime.toInt();
+      if (PartyDelayTime > 99 || PartyDelayTime == 0)
+      {
+        PartyDelayTime = 5;
+      }
+      Serial.print("Party Delay Time = ");
+      Serial.println(PartyDelayTime);
+
       if (program >= 0 && program < 9)
       {
         if (program != PartyProgram)
         {
           ClearLEDstrips();
           PartyProgram = program;
+          PartyProgramChanged = true;
         }
       }
       break;
@@ -486,8 +509,6 @@ void DebugLoop(void)
   groupCounter++;
 }
 
-
-
 int groupNrToOffset(int nr)
 {
   int pin = 0;
@@ -522,11 +543,30 @@ void PartyLoop(void)
   switch (PartyProgram)
   {
   case 0:
+    if (PartyProgramChanged)
+    {
+      PartyProgramChanged = false;
+      Serial.println("Full Rainbow Party!!");
+    }
     PP_Full_Rainbow();
     break;
   
   case 1:
+    if (PartyProgramChanged)
+    {
+      PartyProgramChanged = false;
+      Serial.println("Random Rain Party!!");
+    }
     PP_Random_Rain();
+    break;
+
+  case 2:
+    if (PartyProgramChanged)
+    {
+      PartyProgramChanged = false;
+      Serial.println("Color Wipes Party!!");
+    }
+    PP_ColorWipes();
     break;
 
   default:
@@ -562,7 +602,7 @@ void PP_Full_Rainbow(void)
     }
     led_strip.show();
   }
-  delay(5);
+  delay(PartyDelayTime);
   
   colorOffset++;
 }
@@ -570,6 +610,65 @@ void PP_Full_Rainbow(void)
 void PP_Random_Rain(void)
 {
 
+}
+
+void PP_ColorWipes(void)
+{
+  static uint8_t loopCount = 0;
+  static uint8_t colorLoopCount = 0;
+  static uint32_t activeColor = MY_COLORS[0];
+
+  uint8_t ledPin = 0;
+
+  // Check if loop is at end, start over again with new color
+  if (loopCount >= led_strip.numPixels())
+  {
+    loopCount = 0;
+    // Select new color
+    if (colorLoopCount >= (sizeof(MY_COLORS) / sizeof(MY_COLORS[0])) )
+    {
+      colorLoopCount = 0;
+    }
+    else
+    {
+      colorLoopCount++;
+    }
+    
+    activeColor = MY_COLORS[colorLoopCount];
+  }
+
+  // Idea is that all led bars do the same color
+  for (uint8_t groupCount = 0; groupCount < NUM_OF_GROUPS; groupCount++)
+  {
+    // Set the led functions to the right led bar pin
+    ledPin = groupNrToPin(groupCount);
+    led_strip.setPin(ledPin);
+
+    // Set LEDS
+    for (uint8_t i = 0; i < loopCount; i++)
+    {
+      led_strip.setPixelColor(i, activeColor);
+    }
+    
+    // Show LEDs
+    led_strip.show();
+  }
+  
+  // Delay a small period of time
+  delay(PartyDelayTime);
+
+  // Increment loop count
+  loopCount++;
+}
+
+void ColorWipe(uint32_t color, int delayTime)
+{
+  for(int i = 0; i < led_strip.numPixels(); i++)
+  {
+    led_strip.setPixelColor(i, color);
+    led_strip.show();
+    delay(delayTime);
+  }
 }
 #pragma endregion
 /************************************************************************/
