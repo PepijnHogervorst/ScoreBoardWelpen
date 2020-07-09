@@ -153,7 +153,7 @@
                             <ColumnDefinition Width="210"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Color whipe" Margin="10,20"
+                        <TextBlock Text="Color wipe" Margin="10,20"
                                    Foreground="White" FontSize="16"
                                    VerticalAlignment="Center" HorizontalAlignment="Left"
                                    Grid.Column="0"/>
