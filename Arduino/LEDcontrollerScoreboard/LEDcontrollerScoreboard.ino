@@ -72,7 +72,7 @@ bool IsArcadeBtnEnabled = false;
 bool PartyProgramChanged = true;
 unsigned long prevEventTime = 0;
 uint8_t PartyProgram = 0;
-uint8_t PartyDelayTime = 5;
+uint16_t PartyDelayTime = 5;
 
 int GroupNr = 0;
 int Points = 0;
@@ -85,7 +85,8 @@ const uint32_t MY_COLORS[] = {
   led_strip.Color(0, 0, 255),
   led_strip.Color(255, 255, 0),
   led_strip.Color(0, 255, 255),
-  led_strip.Color(255, 0, 255)
+  led_strip.Color(255, 0, 255),
+  led_strip.Color(255,255,255)
 };
 
 // Lookup table 
@@ -110,6 +111,21 @@ byte neopix_gamma[] = {
 /*                                                                      */
 /************************************************************************/
 
+
+/************************************************************************/
+/*                               STRUCTS                                */
+/************************************************************************/
+struct RainDrop_t
+{
+  int8_t State;
+  uint8_t LedPin;
+  uint8_t Location;
+};
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+
+
 /************************************************************************/
 /*                             PROTOTYPES                               */
 /************************************************************************/
@@ -130,6 +146,7 @@ void ColorWipe(uint32_t color, int delayTime);
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
+
 
 /************************************************************************/
 /*                                 SETUP                                */
@@ -271,6 +288,8 @@ void serialEvent1()
 // decifers serial input and sets leds using a color wheel
 void DeciferMessage()
 {
+  uint8_t program;
+  String BufPartyTime;
   char functionChar = inputString.charAt(0);
   
   // Check first char if msg is led command or brightness or else
@@ -298,9 +317,9 @@ void DeciferMessage()
       // Pary mode!
       IsPartyMode = true;
       // Get program number 
-      uint8_t program = inputString.charAt(1) - '0';
+      program = inputString.charAt(1) - '0';
       // Get party speed (delay time in ms)
-      String BufPartyTime = inputString.substring(2, 4); 
+      BufPartyTime = inputString.substring(2, 4); 
       PartyDelayTime = BufPartyTime.toInt();
       if (PartyDelayTime > 99 || PartyDelayTime == 0)
       {
@@ -607,9 +626,36 @@ void PP_Full_Rainbow(void)
   colorOffset++;
 }
 
+// Random rain drops in random color
 void PP_Random_Rain(void)
 {
+  static RainDrop_t rainScene = { 0, 0, 0};
 
+  int ledPin = 0;
+
+  for (uint8_t i = 0; i < NUM_OF_GROUPS; i++)
+  {
+    ledPin = groupNrToPin(i);
+    led_strip.setPin(ledPin);
+
+    if (rainScene.State <= -1 || rainScene.State >= 6)
+    {
+      // Set new startpoint for raindrop
+      led_strip.clear();
+      led_strip.show();
+    }
+
+    led_strip.setPixelColor(
+      random(4, led_strip.numPixels() - 3),
+      MY_COLORS[random(sizeof(MY_COLORS) / sizeof(MY_COLORS[0]))]
+    );
+    led_strip.show();
+  }
+  
+  delay(PartyDelayTime * 10);
+
+  // Update state of 
+  rainScene.State++;
 }
 
 void PP_ColorWipes(void)
@@ -619,6 +665,7 @@ void PP_ColorWipes(void)
   static uint32_t activeColor = MY_COLORS[0];
 
   uint8_t ledPin = 0;
+  uint32_t newColor;
 
   // Check if loop is at end, start over again with new color
   if (loopCount >= led_strip.numPixels())
@@ -634,7 +681,13 @@ void PP_ColorWipes(void)
       colorLoopCount++;
     }
     
-    activeColor = MY_COLORS[colorLoopCount];
+    // Select new random color from array
+    do
+    {
+      newColor = MY_COLORS[random(sizeof(MY_COLORS) / sizeof(MY_COLORS[0]))];
+    } while (newColor == activeColor);
+    
+    activeColor = newColor;
   }
 
   // Idea is that all led bars do the same color
