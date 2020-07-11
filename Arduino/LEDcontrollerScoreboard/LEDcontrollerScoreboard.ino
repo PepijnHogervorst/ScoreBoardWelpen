@@ -70,7 +70,6 @@ bool messageReceived = false;
 bool IsPartyMode = false;
 bool IsArcadeBtnEnabled = false;
 bool PartyProgramChanged = true;
-unsigned long prevEventTime = 0;
 uint8_t PartyProgram = 0;
 uint16_t PartyDelayTime = 5;
 
@@ -141,6 +140,8 @@ void PartyLoop(void);
 void PP_Full_rainbow(void);
 void PP_Random_Rain(void);
 void PP_ColorWipes(void);
+// Button control prototypes
+void CheckButtonControl(void);
 
 void ColorWipe(uint32_t color, int delayTime);
 /************************************************************************/
@@ -235,9 +236,10 @@ void loop() {
       }
     }
   }
-  
-
-  
+  else
+  {
+    CheckButtonControl();
+  }
   
   #else
   // Debug mode! 
@@ -254,13 +256,9 @@ void loop() {
 /************************************************************************/
 void serialEvent1() 
 {
+  static unsigned long prevEventTime = 0;
   unsigned long currentTime = millis();
-  if ((currentTime - prevEventTime) > 750 ||
-     (((prevEventTime + 750) > currentTime) && prevEventTime > currentTime))
-  {
-    inputString = "";
-    Serial.println("Purged serial input buffer");
-  }
+  
   
   while (Serial1.available()) 
   {
@@ -273,6 +271,13 @@ void serialEvent1()
     if (inputString.length() >= 6) 
     {
       messageReceived = true;
+    }
+
+    if ((currentTime - prevEventTime) > 750 ||
+       (((prevEventTime + 750) > currentTime) && prevEventTime > currentTime))
+    {
+      inputString = "";
+      Serial.println("Purged serial input buffer");
     }
   }
   prevEventTime = millis();
@@ -633,17 +638,14 @@ void PP_Random_Rain(void)
 
   int ledPin = 0;
 
-  for (uint8_t i = 0; i < NUM_OF_GROUPS; i++)
+  for (uint8_t i = 1; i <= NUM_OF_GROUPS; i++)
   {
     ledPin = groupNrToPin(i);
     led_strip.setPin(ledPin);
 
-    if (rainScene.State <= -1 || rainScene.State >= 6)
-    {
-      // Set new startpoint for raindrop
-      led_strip.clear();
-      led_strip.show();
-    }
+    // Always clear strip
+    led_strip.clear();
+    led_strip.show();
 
     led_strip.setPixelColor(
       random(4, led_strip.numPixels() - 3),
@@ -691,7 +693,7 @@ void PP_ColorWipes(void)
   }
 
   // Idea is that all led bars do the same color
-  for (uint8_t groupCount = 0; groupCount < NUM_OF_GROUPS; groupCount++)
+  for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
   {
     // Set the led functions to the right led bar pin
     ledPin = groupNrToPin(groupCount);
@@ -722,6 +724,64 @@ void ColorWipe(uint32_t color, int delayTime)
     led_strip.show();
     delay(delayTime);
   }
+}
+#pragma endregion
+
+#pragma region Button control
+void CheckButtonControl(void)
+{
+  static bool IsBtnHeldDown = false;
+  static long timePressed = 0;
+
+  // Check if button is pressed for certain time
+    bool btnPressed;
+    btnPressed = (digitalRead(BTN_ARCADE) == HIGH);
+    if (btnPressed && !IsBtnHeldDown)
+    {
+      // Small debounce delay
+      delay(25);
+      // Get time to compare when button is released
+      IsBtnHeldDown = true;
+      timePressed = millis();
+    }
+    else if (!btnPressed && IsBtnHeldDown)
+    {
+      IsBtnHeldDown = false;
+      unsigned long currentTime = millis();
+      unsigned long timePassed = currentTime - timePressed;
+      if (timePassed > 0 && timePassed < 1000)
+      {
+        if (IsPartyMode)
+        {
+          // Change party mode
+          ClearLEDstrips();
+          if (PartyProgram > 3)
+          {
+            PartyProgram = 0;
+          }
+          else
+          {
+            PartyProgram++;
+          }
+          PartyProgramChanged = true;
+        }
+      }
+      else if (timePassed >= 2000 && timePassed < 5000)
+      {
+        IsPartyMode = !IsPartyMode;
+        if (IsPartyMode)
+        {
+          Serial.println("Party!");
+          digitalWrite(BTN_INDICATOR, HIGH);
+        }
+        else
+        {
+          Serial.println("Party stopped..");
+          digitalWrite(BTN_INDICATOR, LOW);
+          ClearLEDstrips();
+        }
+      }
+    }
 }
 #pragma endregion
 /************************************************************************/
