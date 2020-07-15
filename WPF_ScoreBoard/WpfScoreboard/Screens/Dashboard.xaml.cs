@@ -57,6 +57,7 @@ namespace WpfScoreboard.Screens
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             this.UnhookEvents();
+            Globals.Communication.CloseDevice();
         }
         #endregion
 

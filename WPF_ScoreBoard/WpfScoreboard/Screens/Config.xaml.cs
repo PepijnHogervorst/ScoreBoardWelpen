@@ -96,6 +96,20 @@ namespace WpfScoreboard.Screens
                 Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, Globals.Storage.CurrentDate.ToString("D"));
             }
         }
+
+        private void CbCommPorts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!this.IsLoaded) return;
+
+            if (sender is ComboBox comboBox)
+            {
+                string item = comboBox.SelectedItem.ToString();
+
+                if (String.IsNullOrEmpty(item)) return;
+
+                Globals.Storage.SettingsReplace(Classes.SettingNames.ComPort, item);
+            }
+        }
         #endregion
 
 
@@ -167,6 +181,7 @@ namespace WpfScoreboard.Screens
             string activePort = Globals.Storage.GetCommPort();
             CbCommPorts.SelectedItem = activePort;
         }
+
         #endregion
 
         
