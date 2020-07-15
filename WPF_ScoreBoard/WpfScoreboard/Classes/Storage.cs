@@ -18,8 +18,9 @@ namespace WpfScoreboard.Classes
     public class Storage
     {
         #region Private properties
-        private const string dbName = "storage.db";
+        private const string dbName = "Welpen/storage.db";
         private static readonly string dbpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), dbName);
+        private static readonly string dbDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Welpen");
 
         private Tables.Table Groups;
         private Tables.Table Points;
@@ -66,6 +67,12 @@ namespace WpfScoreboard.Classes
 
         public void InitializeDatabase()
         {
+            // Create dir 
+            if (!Directory.Exists(dbDir))
+            {
+                Directory.CreateDirectory(dbDir);
+            }
+
             // Create directory if not existing
             using (SqliteConnection db = new SqliteConnection($"Filename={dbpath}"))
             {
