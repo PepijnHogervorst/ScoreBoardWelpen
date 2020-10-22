@@ -1,8 +1,12 @@
 /************************************************************************/
 /*                               INCLUDES                               */
 /************************************************************************/
+#include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+#include <SPI.h>
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -106,6 +110,20 @@ byte neopix_gamma[] = {
   144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+
+// memory pools for JSON parsing
+StaticJsonDocument<256> doc_receive;
+StaticJsonDocument<256> doc_send;
+
+// Ethernet config arduino!
+byte mac[] = { 0xD1, 0xAD, 0xBE, 0xEF, 0xCE, 0xAE };
+IPAddress ip(192, 168, 68, 90);
+IPAddress server(192, 168, 68, 119);
+EthernetClient ethClient;
+PubSubClient mqtt_client(ethClient);
+
+// General variables
+unsigned long prev_keep_alive;
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -128,6 +146,10 @@ struct RainDrop_t
 /************************************************************************/
 /*                             PROTOTYPES                               */
 /************************************************************************/
+void callback(char* topic, byte* payload, unsigned int length);
+void reconnect();
+void keep_alive();
+void decipher_message(char* topic, char payload[]);
 void DeciferMessage();
 void WriteLedStrip();
 int groupNrToPin(int nr);
@@ -166,7 +188,6 @@ void setup() {
   
   // Startup delay to let power supply stabilize
   delay(3000);
-  led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
 
   // Retrieve brightness from eeprom
   int brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
@@ -177,7 +198,18 @@ void setup() {
     brightness = BRIGHTNESS;
   }
 
+  // Initialize MQTT config
+  mqtt_client.setServer(server, 1883);
+  mqtt_client.setCallback(callback);
+
+  // Start ethernet on static IP
+  Ethernet.begin(mac, ip);
+  Serial.print("Arduino ip=");
+  Serial.println(ip);
+
+
   // Init the led strip
+  led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
   led_strip.setBrightness(brightness);
   led_strip.begin();
   led_strip.clear();
@@ -210,6 +242,16 @@ void setup() {
 /************************************************************************/
 void loop() {
   #ifndef DEBUG
+  // Handle MQTT connection and keep alive
+  if (!mqtt_client.connected())
+  {
+    reconnect();
+  }
+  mqtt_client.loop();
+
+  keep_alive();
+  
+
   // Check if serial message is received
   if(messageReceived)
   {
@@ -221,6 +263,8 @@ void loop() {
     messageReceived = false;
     inputString = "";
   }
+
+  // Check what mode the arduino is in
   if (IsPartyMode)
   {
     PartyLoop();
@@ -282,6 +326,28 @@ void serialEvent1()
   }
   prevEventTime = millis();
 }
+
+// MQTT callback when message on subscribed topic is received
+void callback(char* topic, byte* payload, unsigned int length) 
+{
+  // Cast payload to string
+  char content[length] = "";
+  char character;
+  for (int num = 0; num < length; num++) 
+  {
+    //character = payload[num];
+    content[num] = payload[num];
+  }
+
+  Serial.println("Received msg!");
+  Serial.print("Topic: ");
+  Serial.println(topic);
+  Serial.print("Payload: ");
+  Serial.println(content);
+
+  // Parse payload
+  decipher_mqtt_message(topic, content);
+}
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -289,6 +355,86 @@ void serialEvent1()
 /************************************************************************/
 /*                              FUNCTIONS                               */
 /************************************************************************/
+#pragma region MQTT methods
+void reconnect() 
+{
+  // Loop until we're reconnected
+  while (!mqtt_client.connected()) {
+    // Attempt to connect
+    if (mqtt_client.connect("arduinoClient")) 
+    {
+      Serial.println("Connected to MQTT broker!");
+      
+      // Once connected, resubscribe to topics:
+      mqtt_client.subscribe(topic_led_mode);
+      mqtt_client.subscribe(topic_led_manual_color);
+      mqtt_client.subscribe(topic_led_brightness);
+      
+      // Publish status / keep alive
+      mqtt_client.publish(topic_led_status, "Alive");
+    } 
+    else 
+    {
+      Serial.print("failed to connect to mqtt broker, rc=");
+      Serial.print(mqtt_client.state());
+      Serial.print(" ip server=");
+      Serial.println(server);
+      
+      // Wait 3 seconds before retrying
+      delay(3000);
+    }
+  }
+}
+
+void keep_alive()
+{
+  unsigned long current_time = millis();
+
+  // Check time elapsed is more than 1 sec
+  if ((current_time - prev_keep_alive) >= 1000)
+  {
+    char send_buf[100];
+    doc_send.clear();
+    doc_send["State"] = "Alive";
+    doc_send["Type"] = "Scoreboard";
+
+    // Publish alive message
+    serializeJson(doc_send, send_buf);
+    mqtt_client.publish(topic_led_status, send_buf);
+    // Update prev time
+    prev_keep_alive = current_time;
+  }
+}
+
+void decipher_mqtt_message(char* topic, char payload[])
+{
+  // Deserialize json
+  DeserializationError exception = deserializeJson(doc_receive, payload);
+  
+  // Check for succes of deserialization
+  if (exception)
+  {
+    Serial.println("Failed to deserialize JSON..");
+    return;
+  }
+
+  // Compare topic!
+  if (strcmp(topic, "Scoreboard/Party") == 0)
+  {
+    mqtt_set_party();
+  }
+  else if (strcmp(topic, "Scoreboard/ButtonProgram") == 0)
+  {
+    mqtt_set_buttonprogram();
+  }
+  else if (strcmp(topic, "Scoreboard/Brightness") == 0)
+  {
+    mqtt_set_brightness();
+  }
+}
+
+#pragma endregion
+
 // Function where most of the magic happens, 
 // decifers serial input and sets leds using a color wheel
 void DeciferMessage()
