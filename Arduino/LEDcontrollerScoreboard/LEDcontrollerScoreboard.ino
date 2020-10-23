@@ -118,9 +118,12 @@ StaticJsonDocument<256> doc_receive;
 StaticJsonDocument<256> doc_send;
 
 // Ethernet config arduino!
-byte mac[] = { 0xD1, 0xAD, 0xBE, 0xEF, 0xCE, 0xAE };
-IPAddress ip(192, 168, 68, 90);
-IPAddress server(192, 168, 68, 102);
+byte mac[] = { 0xD1, 0xAD, 0xBE, 0xEF, 0xCE, 0xAA };
+// IPAddress ip(192, 168, 68, 90);
+// IPAddress server(192, 168, 68, 102);
+IPAddress ip(192, 168, 178, 98);
+IPAddress server(192, 168, 178, 99);
+
 EthernetClient ethClient;
 PubSubClient mqtt_client(ethClient);
 
