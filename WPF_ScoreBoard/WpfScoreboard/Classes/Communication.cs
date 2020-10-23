@@ -82,13 +82,13 @@ namespace WpfScoreboard.Classes
         public void SetLeds(int group, int points)
         {
             string ledMessage;
-            ledMessage = 'g' + group.ToString() + 'p' + points.ToString("D3");
+            ledMessage = "gg" + group.ToString() + 'p' + points.ToString("D3");
             WriteSerial(ledMessage);
         }
 
         public void ClearLEDs()
         {
-            string msg = "c00000";
+            string msg = "cc00000";
             WriteSerial(msg);
         }
 

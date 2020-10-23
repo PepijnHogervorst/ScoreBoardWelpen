@@ -308,7 +308,7 @@ void DeciferMessage()
         ClearLEDstrips();
       }
       IsPartyMode = false;
-
+      Serial.println("Enabling button!");
       // Enable the button, when pressed write ledstrip
       EnableArcadeButton();
       break;
@@ -391,6 +391,8 @@ void EnableArcadeButton()
     {
       // points string not digit, return
       Serial.println("POINTS NOT ALL DIGITS, NOT SETTING LEDS");
+      Serial.print("String = ");
+      Serial.println(pointsString);
       return;
     }
   }
