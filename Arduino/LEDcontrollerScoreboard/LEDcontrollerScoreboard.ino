@@ -128,8 +128,10 @@ PubSubClient mqtt_client(ethClient);
 const char topic_button_prog[]  = "Scoreboard/ButtonProgram";
 const char topic_party[]        = "Scoreboard/Party";
 const char topic_brightness[]   = "Scoreboard/Brightness";
-const char topic_status[]       = "Scoreboard/Status";
 const char topic_stop_party[]   = "Scoreboard/Clear";
+
+const char topic_status[]       = "Scoreboard/Status";
+const char topic_ready[]        = "Scoreboard/Ready";
 
 // General variables
 unsigned long prev_keep_alive;
@@ -605,6 +607,18 @@ void WriteLedStrip()
   while(loopCount <= Points);
 
   Serial.println("LEDS set! Waiting for new command..");
+
+  // Create ready msg in JSON format
+  char send_buf[100];
+  doc_send.clear();
+  doc_send["Ready"] = true;
+  
+  // Publish ready message
+  if (mqtt_client.connected())
+  {
+    serializeJson(doc_send, send_buf);
+    mqtt_client.publish(topic_ready, send_buf);
+  }
 }
 
 int groupNrToPin(int nr)
