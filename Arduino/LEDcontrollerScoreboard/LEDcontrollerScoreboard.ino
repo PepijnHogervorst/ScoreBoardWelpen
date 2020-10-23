@@ -514,6 +514,8 @@ void mqtt_set_brightness()
 
   // Update ledstrip brightness
   led_strip.setBrightness(bright);
+  LED_Brightness = bright;
+
   // Save brightness in eeprom
   EEPROM.write(BRIGHTNESS_ADDRESS, bright);
 
