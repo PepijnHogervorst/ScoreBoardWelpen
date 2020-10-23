@@ -444,6 +444,10 @@ void mqtt_set_party()
   // Set Party mode!
   IsPartyMode = true;
 
+  // Clear score if set
+  IsArcadeBtnEnabled = false;
+  digitalWrite(BTN_INDICATOR, LOW);
+
   // Get the program nr and delay time
   uint8_t program = doc_receive["Program"];
   uint8_t delay = doc_receive["Delay"];
