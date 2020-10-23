@@ -128,9 +128,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Classes\Communication.cs" />
     <Compile Include="Classes\Config.cs" />
     <Compile Include="Classes\Globals.cs" />
+    <Compile Include="Classes\MQTTClient.cs" />
     <Compile Include="Classes\Storage.cs" />
     <Compile Include="Screens\Config.xaml.cs">
       <DependentUpon>Config.xaml</DependentUpon>

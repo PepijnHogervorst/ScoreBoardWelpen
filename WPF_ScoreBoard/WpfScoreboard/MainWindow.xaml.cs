@@ -36,11 +36,14 @@ namespace WpfScoreboard
             // Set date to current date on pc
             Globals.Storage.CurrentDate = DateTimeOffset.Now;
             Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, DateTimeOffset.Now.ToString());
+
+            // Start MQTT client
+            Globals.MQTTClient.Connect();
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.CloseDevice();
+            Globals.MQTTClient.Close();
         }
         #endregion
 
