@@ -756,6 +756,15 @@ void PartyLoop(void)
     PP_ColorWipes();
     break;
 
+  case 3:
+    if (PartyProgramChanged)
+    {
+      PartyProgramChanged = false;
+      Serial.println("WOW single color rainbow!!");
+    }
+    PP_Rainbow_Single_Color();
+    break;
+
   default:
     break;
   }
@@ -887,6 +896,47 @@ void ColorWipe(uint32_t color, int delayTime)
     led_strip.show();
     delay(delayTime);
   }
+}
+
+void PP_Falling_Rain(void)
+{
+  
+}
+
+void PP_Rainbow_Single_Color(void)
+{
+  static uint16_t colorOffset = 0; 
+  int ledPin = 0;
+  int groupOffset = 0;
+  uint16_t ledStart = 0;
+  uint32_t color;
+
+  // Check if offset is at end of led total count
+  if (colorOffset >= 255)
+  {
+    colorOffset = 0;
+  }
+
+  // Loop through all led strips
+  for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
+  {
+    ledPin = groupNrToPin(groupCount);
+    groupOffset = groupNrToOffset(groupCount);
+    
+    led_strip.setPin(ledPin);
+    // Each led strip has his own start point 
+    ledStart = groupOffset + colorOffset;
+    color = Wheel((ledStart) & 0xFF);
+
+    for (uint16_t i = 0; i < led_strip.numPixels(); i++)
+    {
+      led_strip.setPixelColor(i, color);
+    }
+    led_strip.show();
+  }
+  delay(PartyDelayTime);
+  
+  colorOffset++;
 }
 #pragma endregion
 

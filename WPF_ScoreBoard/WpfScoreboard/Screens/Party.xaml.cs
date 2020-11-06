@@ -26,6 +26,7 @@ namespace WpfScoreboard.Screens
             FullRainbow = 0,
             RandomRain,
             ColorWipe,
+            CollorCyclePillar,
         }
 
         private PartyProgram ActiveProgram = PartyProgram.FullRainbow;
@@ -68,6 +69,11 @@ namespace WpfScoreboard.Screens
         {
             SetPartyProgram(PartyProgram.ColorWipe);
         }
+
+        private void RbColorCyclePerPillar_Click(object sender, RoutedEventArgs e)
+        {
+            SetPartyProgram(PartyProgram.CollorCyclePillar);
+        }
         #endregion
 
         #region Slider event methods
@@ -106,5 +112,6 @@ namespace WpfScoreboard.Screens
         }
         #endregion
 
+        
     }
 }

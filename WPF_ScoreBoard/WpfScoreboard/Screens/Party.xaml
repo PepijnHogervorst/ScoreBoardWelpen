@@ -113,56 +113,85 @@
                                  Grid.Row="0" Grid.Column="2"
                                  MinHeight="50" MinWidth="300"
                                  VerticalAlignment="Center" HorizontalAlignment="Center">
-                <StackPanel Orientation="Vertical" Margin="5">
-                    <TextBlock Text="Party program" Margin="5,10"
-                               Foreground="Gold" FontSize="17"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="210"/>
-                        </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
 
-                        <TextBlock Text="Full rainbow" Margin="10,20"
-                                   Foreground="White" FontSize="16"
-                                   VerticalAlignment="Center" HorizontalAlignment="Left"
-                                   Grid.Column="0"/>
-                        <RadioButton x:Name="RbFullRainbow" Margin="10, 20"
-                                     Style="{StaticResource MaterialDesignRadioButton}"
-                                     Grid.Column="1" HorizontalAlignment="Right"
-                                     GroupName="PartyProgram" Click="RbFullRainbow_Click" Tag="0"/>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="210"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Random rain" Margin="10,20"
-                                   Foreground="White" FontSize="16"
-                                   VerticalAlignment="Center" HorizontalAlignment="Left"
-                                   Grid.Column="0"/>
-                        <RadioButton x:Name="RbRain" Margin="10, 20"
-                                     Style="{StaticResource MaterialDesignRadioButton}"
-                                     Grid.Column="1" HorizontalAlignment="Right" 
-                                     GroupName="PartyProgram" Click="RbRain_Click" Tag="1"/>
-                    </Grid>
+                    <!--#region Row 0 -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                               Text="Party program" 
+                               Margin="5,10"
+                               Foreground="Gold" 
+                               FontSize="17"/>
+                    <!--#endregion-->
+
+                    <!--#region Row 1 -->
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="Full rainbow" Margin="10,20"
+                               Foreground="White" FontSize="16"
+                               VerticalAlignment="Center" HorizontalAlignment="Left"/>
                     
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="210"/>
-                        </Grid.ColumnDefinitions>
+                    <RadioButton x:Name="RbFullRainbow" 
+                                 Grid.Row="1" Grid.Column="1"
+                                 Margin="10, 20"
+                                 Style="{StaticResource MaterialDesignRadioButton}"
+                                 HorizontalAlignment="Right"
+                                 GroupName="PartyProgram" 
+                                 Click="RbFullRainbow_Click" Tag="0"/>
+                    <!--#endregion-->
 
-                        <TextBlock Text="Color wipe" Margin="10,20"
-                                   Foreground="White" FontSize="16"
-                                   VerticalAlignment="Center" HorizontalAlignment="Left"
-                                   Grid.Column="0"/>
-                        <RadioButton x:Name="RbColorWipe" Margin="10, 20"
-                                     Style="{StaticResource MaterialDesignRadioButton}"
-                                     Grid.Column="1" HorizontalAlignment="Right" 
-                                     GroupName="PartyProgram" Click="RbColorWipe_Click" Tag="2"/>
-                    </Grid>
-                </StackPanel>
+                    <!--#region Row 2 -->
+                    <TextBlock Grid.Row="2" Grid.Column="0"
+                               Text="Random rain" Margin="10,20"
+                               Foreground="White" FontSize="16"
+                               VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    
+                    <RadioButton x:Name="RbRain" 
+                                 Grid.Row="2" Grid.Column="1"
+                                 Margin="10, 20"
+                                 Style="{StaticResource MaterialDesignRadioButton}"
+                                 HorizontalAlignment="Right" 
+                                 GroupName="PartyProgram" Click="RbRain_Click" Tag="1"/>
+                    <!--#endregion-->
+
+                    <!--#region Row 3 -->
+                    <TextBlock Grid.Row="3" Grid.Column="0" 
+                               Text="Color wipe" Margin="10,20"
+                               Foreground="White" FontSize="16"
+                               VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    
+                    <RadioButton x:Name="RbColorWipe" 
+                                 Grid.Row="3" Grid.Column="1"
+                                 Margin="10, 20"
+                                 Style="{StaticResource MaterialDesignRadioButton}"
+                                 HorizontalAlignment="Right" 
+                                 GroupName="PartyProgram" Click="RbColorWipe_Click" Tag="2"/>
+                    <!--#endregion-->
+
+                    <!--#region Row 4 -->
+                    <TextBlock Grid.Row="4" Grid.Column="0" 
+                               Text="Color cycle per pillar" Margin="10,20"
+                               Foreground="White" FontSize="16"
+                               VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                    <RadioButton x:Name="RbColorCyclePerPillar" 
+                                 Grid.Row="4" Grid.Column="1"
+                                 Margin="10, 20"
+                                 Style="{StaticResource MaterialDesignRadioButton}"
+                                 HorizontalAlignment="Right" 
+                                 GroupName="PartyProgram" Click="RbColorCyclePerPillar_Click" Tag="2"/>
+                    <!--#endregion-->
+                </Grid>
             </materialdesign:Card>
         </Grid>
     </Grid>
