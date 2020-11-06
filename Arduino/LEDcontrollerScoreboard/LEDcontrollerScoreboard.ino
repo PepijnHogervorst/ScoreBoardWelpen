@@ -729,44 +729,44 @@ void PartyLoop(void)
 {
   switch (PartyProgram)
   {
-  case 0:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Full Rainbow Party!!");
-    }
-    PP_Full_Rainbow();
-    break;
+    case 0:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Full Rainbow Party!!");
+      }
+      PP_Full_Rainbow();
+      break;
   
-  case 1:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Random Rain Party!!");
-    }
-    PP_Random_Rain();
-    break;
+    case 1:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Random Rain Party!!");
+      }
+      PP_Random_Rain();
+      break;
 
-  case 2:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Color Wipes Party!!");
-    }
-    PP_ColorWipes();
-    break;
+    case 2:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Color Wipes Party!!");
+      }
+      PP_ColorWipes();
+      break;
 
-  case 3:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("WOW single color rainbow!!");
-    }
-    PP_Rainbow_Single_Color();
-    break;
+    case 3:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("WOW single color rainbow!!");
+      }
+      PP_Rainbow_Single_Color();
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
   
 }
