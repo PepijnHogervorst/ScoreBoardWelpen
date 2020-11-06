@@ -54,6 +54,20 @@ namespace WpfScoreboard.Screens
         }
         #endregion
 
+
+        #region Button events
+        private void BtnStrobe_Active(object sender, RoutedEventArgs e)
+        {
+            Globals.MQTTClient.SetStrobe(true, 100, 255, 0, 0, 20);
+        }
+
+        private void BtnStrobe_Inactive(object sender, MouseEventArgs e)
+        {
+            Globals.MQTTClient.SetStrobe(false, 100, 255, 0 ,0, 20);
+        }
+        #endregion
+
+
         #region Radio button event methods
         private void RbFullRainbow_Click(object sender, RoutedEventArgs e)
         {
@@ -110,6 +124,9 @@ namespace WpfScoreboard.Screens
             Globals.MQTTClient.SetParty((int)program, (int)SliderSpeed.Value);
             ActiveProgram = program;
         }
+
+
+
         #endregion
 
         

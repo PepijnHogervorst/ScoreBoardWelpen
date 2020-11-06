@@ -78,6 +78,10 @@ bool reconnectTimerFlag = true;
 uint8_t PartyProgram = 0;
 uint8_t LED_Brightness = 0;
 uint16_t PartyDelayTime = 5;
+uint16_t strobe_delay = 500;
+uint32_t strobe_color = led_strip.Color(255,255,255);
+uint8_t strobe_brightness = 100;
+bool is_strobe_active = false;
 
 int GroupNr = 0;
 int Points = 0;
@@ -132,6 +136,7 @@ const char topic_button_prog[]  = "Scoreboard/ButtonProgram";
 const char topic_party[]        = "Scoreboard/Party";
 const char topic_brightness[]   = "Scoreboard/Brightness";
 const char topic_stop_party[]   = "Scoreboard/Clear";
+const char topic_strobe[]       = "Scoreboard/Strobe";
 
 const char topic_status[]       = "Scoreboard/Status";
 const char topic_ready[]        = "Scoreboard/Ready";
@@ -279,7 +284,7 @@ void loop() {
   {
     if (digitalRead(BTN_ARCADE) == HIGH)
     {
-      delay(75);
+      delay(70);
       if (digitalRead(BTN_ARCADE) == HIGH)
       {
         WriteLedStrip();
@@ -353,6 +358,7 @@ void reconnect()
       mqtt_client.subscribe(topic_party);
       mqtt_client.subscribe(topic_brightness);
       mqtt_client.subscribe(topic_stop_party);
+      mqtt_client.subscribe(topic_strobe);
       
       // Publish status / keep alive in JSON format
       char send_buf[100];
@@ -439,6 +445,10 @@ void decipher_mqtt_message(char* topic, char payload[])
   else if (strcmp(topic, topic_stop_party) == 0)
   {
     mqtt_stop_party();
+  }
+  else if (strcmp(topic, topic_strobe) == 0)
+  {
+    mqtt_set_strobe();
   }
 }
 
@@ -534,6 +544,25 @@ void mqtt_stop_party()
   Serial.println("Party is over BOYS.. Clearing ledstrips");
   IsPartyMode = false;
   ClearLEDstrips();
+}
+
+void mqtt_set_strobe()
+{
+  strobe_brightness = doc_receive["Brightness"];
+  strobe_color = doc_receive["Color"];
+  strobe_delay = doc_receive["Time"];
+  is_strobe_active = doc_receive["Active"];
+
+  if (is_strobe_active)
+  {
+    Serial.println("Strobe ACTIVE!");
+  }
+  else
+  {
+    Serial.println("Strobe OFFLINE!");
+  }
+  
+  
 }
 #pragma endregion
 
@@ -727,6 +756,21 @@ void ClearLEDstrips()
 #pragma region PARTY PROGRAM FUNCTIONS
 void PartyLoop(void)
 {
+  static bool was_strobe_active = true;
+  if (is_strobe_active)
+  {
+    was_strobe_active = true;
+    PP_Strobe();
+    return;
+  }
+
+  if (was_strobe_active)
+  {
+    led_strip.setBrightness(LED_Brightness);
+    was_strobe_active = false;
+  }
+  
+
   switch (PartyProgram)
   {
     case 0:
@@ -763,6 +807,15 @@ void PartyLoop(void)
         Serial.println("WOW single color rainbow!!");
       }
       PP_Rainbow_Single_Color();
+      break;
+    
+    case 4:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Undefined program for now..");
+      }
+      
       break;
 
     default:
@@ -937,6 +990,66 @@ void PP_Rainbow_Single_Color(void)
   delay(PartyDelayTime);
   
   colorOffset++;
+}
+
+void PP_Strobe(void)
+{
+  // Keep track of time to toggle strobe 
+  static unsigned long prev_time = 0;
+  static bool toggle = false;
+  static uint8_t brightness;
+
+  unsigned long curr_time = millis();
+
+  
+
+  if (curr_time > prev_time)
+  {
+    if (curr_time - prev_time >= strobe_delay)
+    {
+      // Strobe must never work on full brightness
+      if (LED_Brightness > 150)
+      {
+        led_strip.setBrightness(150);
+      }
+
+      // Update prev time 
+      prev_time = curr_time;
+
+      // Toggle leds
+      uint32_t color;
+      if (toggle)
+      {
+        color = strobe_color;
+      }
+      else
+      {
+        color = led_strip.Color(0,0,0);
+      }
+      for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
+      {
+        // set correct pin
+        led_strip.setPin(groupNrToPin(groupCount));
+
+        // Set color of tower
+        for (uint16_t i = 0; i < led_strip.numPixels(); i++)
+        {
+          led_strip.setPixelColor(i, color);
+        }
+        led_strip.show();
+      }
+
+      // Toggle the on / off state
+      toggle = !toggle;
+    }
+  }
+  else
+  {
+    // Catch overflow by ignoring it (approx once in 50 days)
+    prev_time = curr_time;
+  }
+  
+  
 }
 #pragma endregion
 

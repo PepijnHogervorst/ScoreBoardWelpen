@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MaterialDesignColors.Recommended;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace WpfScoreboard.Classes
             "Scoreboard/Party",
             "Scoreboard/Brightness",
             "Scoreboard/Clear",
+            "Scoreboard/Strobe",
         };
         #endregion
 
@@ -144,6 +146,21 @@ namespace WpfScoreboard.Classes
             var data = new ClearLEDsData();
             Publish(topics_write[3], JsonConvert.SerializeObject(data));
         }
+
+        public void SetStrobe(bool active, int time, int red, int green, int blue, int brightness)
+        {
+            // 0xGGRRBB
+            int color = (green << 16) + (red << 8) + blue;
+            var data = new StrobeData
+            {
+                Active = active,
+                Time = time,
+                Color = color,
+                Brightness = brightness,
+            };
+
+            Publish(topics_write[4], JsonConvert.SerializeObject(data));
+        }
         #endregion
 
         #region Private methods
@@ -202,6 +219,14 @@ namespace WpfScoreboard.Classes
             public string State { get; set; }
             public int Brightness { get; set; }
             public string Version { get; set; }
+        }
+
+        private class StrobeData
+        {
+            public bool Active { get; set; }
+            public int Brightness { get; set; }
+            public int Time { get; set; }
+            public int Color { get; set; }
         }
         #endregion
     }

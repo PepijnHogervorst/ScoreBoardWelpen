@@ -104,7 +104,10 @@
                         <Button x:Name="BtnStrobe" Content="Strobe"
                                 Width="100"
                                 Margin="5"
-                                Grid.Column="1" HorizontalAlignment="Right"/>
+                                Grid.Column="1" HorizontalAlignment="Right"
+                                MouseEnter="BtnStrobe_Active"
+                                MouseLeave="BtnStrobe_Inactive"
+                                MouseUp="BtnStrobe_Inactive"/>
                     </Grid>
                 </StackPanel>
             </materialdesign:Card>
