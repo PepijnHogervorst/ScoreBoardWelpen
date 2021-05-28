@@ -16,7 +16,7 @@
                     Width="400">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock x:Name="TxtPointsHeader" Text="Punten" FontSize="18" FontWeight="Bold"
-                           Margin="5"/>
+                           Margin="5" Foreground="{StaticResource PrimaryHueMidBrush}"/>
                     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="0.45*"/>
@@ -31,17 +31,17 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="TxtGroup1" Grid.Row="0" Grid.Column="0" Text="Groep 1:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
                         <TextBlock x:Name="TxtGroup2" Grid.Row="0" Grid.Column="1" Text="Groep 2:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
                         <TextBlock x:Name="TxtGroup3" Grid.Row="0" Grid.Column="2" Text="Groep 3:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
                         <TextBlock x:Name="TxtGroup4" Grid.Row="0" Grid.Column="3" Text="Groep 4:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
                         <TextBlock x:Name="TxtGroup5" Grid.Row="0" Grid.Column="4" Text="Groep 5:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
                         <TextBlock x:Name="TxtGroup6" Grid.Row="0" Grid.Column="5" Text="Groep 6:"
-                               Margin="10,5"/>
+                               Margin="10,5" Foreground="White" Opacity="0.8"/>
 
                         <TextBox x:Name="TxtBoxGroup1" Grid.Row="1" Grid.Column="0" Margin="10,0,10,5"
                              TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
@@ -69,13 +69,16 @@
 
                     <!--#region Row 0 -->
                     <TextBlock x:Name="TxtDateHeader" Text="Datum" FontSize="18" FontWeight="Bold"
-                           Margin="5" Grid.Row="0"/>
+                               Margin="5" Grid.Row="0"
+                               Foreground="{StaticResource PrimaryHueMidBrush}"/>
                     <!--#endregion-->
 
                     <!--#region Row 1 -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
                         <TextBlock x:Name="TxtStartDate" Text="Start van zomerkamp: " FontSize="18" 
-                               VerticalAlignment="Center" Margin="13,5"/>
+                                   VerticalAlignment="Center" Margin="13,5"
+                                   Foreground="{StaticResource  MaterialDesignDarkForeground}"
+                                   Opacity="0.8"/>
                         <DatePicker x:Name="DatePickerStartDate" Margin="5" FontSize="18" SelectedDateChanged="DatePickerStartDate_SelectedDateChanged"/>
                     </StackPanel>
                     <!--#endregion-->
@@ -83,20 +86,14 @@
                     <!--#region Row 2 -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
                         <TextBlock x:Name="TxtCurrentDate" Text="Huidige datum: " FontSize="18" 
-                               VerticalAlignment="Center" Margin="5"/>
+                                   VerticalAlignment="Center" Margin="5"
+                                   Foreground="{StaticResource  MaterialDesignDarkForeground}"
+                                   Opacity="0.8"/>
                         <DatePicker x:Name="DatePickerCurrentDate" Margin="5" FontSize="18" SelectedDateChanged="DatePickerCurrentDate_SelectedDateChanged"/>
                     </StackPanel>
                     <!--#endregion-->
                 </Grid>
-            </materialDesign:Card>
-            <materialDesign:Card BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Center" Margin="10"
-                    Width="400">
-                    <Grid>
-                        <TextBlock Text="Comm port" FontSize="18" FontWeight="Bold" Margin="5"/>
-                        <ComboBox x:Name="CbCommPorts" IsEditable="False" Width="100" ToolTip="Selecteer de communicatie port" HorizontalAlignment="Right"
-                              Margin="5,2" FontSize="18" SelectionChanged="CbCommPorts_SelectionChanged"/>
-                    </Grid>
-            </materialDesign:Card>
+            </materialDesign:Card >
 
             <materialDesign:Card BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Center" Margin="10"
                     Width="400">
@@ -108,7 +105,8 @@
 
                     <!--#region Row 0 -->
                     <TextBlock x:Name="TxtResetHeader" Text="Begin opnieuw" FontSize="18" FontWeight="Bold"
-                           Margin="5" HorizontalAlignment="Left" Grid.Row="0"/>
+                               Margin="5" HorizontalAlignment="Left" Grid.Row="0"
+                               Foreground="{StaticResource PrimaryHueMidBrush}"/>
                     <!--#endregion-->
 
 
