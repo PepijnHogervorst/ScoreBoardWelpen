@@ -28,6 +28,11 @@ namespace WpfScoreboard.Classes
         {
 
         }
+
+        ~MqttBroker()
+        {
+            Stop();
+        }
         #endregion
 
 
@@ -39,17 +44,34 @@ namespace WpfScoreboard.Classes
             var optionsBuilder = new MqttServerOptionsBuilder()
                 .WithDefaultEndpointPort(1883);
 
-            _broker = new MqttFactory().CreateMqttServer();
-            await _broker.StartAsync(optionsBuilder.Build());
+            // In try catch for if 
+            try
+            {
+                // Create broker and start it
+                _broker = new MqttFactory().CreateMqttServer();
+                await _broker.StartAsync(optionsBuilder.Build());
+            }
+            catch (Exception)
+            {
+
+            }
+            
         }
 
         public async Task Stop()
         {
             if (_broker == null) return;
 
-            await _broker.StopAsync();
-            _broker.Dispose();
-            _broker = null;
+            try
+            {
+                await _broker.StopAsync();
+                _broker.Dispose();
+                _broker = null;
+            }
+            catch (Exception)
+            {
+            }
+            
         }
         #endregion
 
