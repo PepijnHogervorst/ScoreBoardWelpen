@@ -1,6 +1,6 @@
 # Interactive score board
 
-A RGB scoreboard for 6 teams to keep track of the team score during `welpen camp`.
+A RGB scoreboard for 6 teams to keep track of the team score during `Welpenkamp`.
 A intelegent scoreboard that keeps track of score, person that should press the button and controls led strips using an arduino with ethernet communication. The communication between PC and arduino is MQTT. Using simple topics
 
 ## How to use
@@ -15,6 +15,11 @@ Ethernet settings:
 
 ## MQTT API
 
+MQTT settings:
+
+* No username / password
+* Port 1883
+
 ### Scoreboard program
 
 Topic: `Scoreboard/ButtonProgram`
@@ -27,6 +32,12 @@ Payload:
     "Points":55
 }
 ```
+
+The arduino will respond with a ready signal if the button is pressed:
+
+Topic: `Scoreboard/Ready`
+
+Payload: No payload required
 
 ### Party mode
 
