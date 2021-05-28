@@ -44,17 +44,17 @@
                                Margin="10,5" Foreground="White" Opacity="0.8"/>
 
                         <TextBox x:Name="TxtBoxGroup1" Grid.Row="1" Grid.Column="0" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                         <TextBox x:Name="TxtBoxGroup2" Grid.Row="1" Grid.Column="1" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                         <TextBox x:Name="TxtBoxGroup3" Grid.Row="1" Grid.Column="2" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                         <TextBox x:Name="TxtBoxGroup4" Grid.Row="1" Grid.Column="3" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                         <TextBox x:Name="TxtBoxGroup5" Grid.Row="1" Grid.Column="4" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                         <TextBox x:Name="TxtBoxGroup6" Grid.Row="1" Grid.Column="5" Margin="10,0,10,5"
-                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3"/>
+                             TextChanged="TxtBoxGroup_TextChanged" InputScope="Number" MaxLength="3" Foreground="White"/>
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>
