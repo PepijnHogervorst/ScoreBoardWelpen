@@ -27,8 +27,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.1.1.1</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.2.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -56,10 +56,10 @@
     <ApplicationIcon>StoreLogo.scale-400.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>8BEF62A2E6D107415127B6C54CD076A002188F83</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>D392AB9423680D5126C84BA82870BC9F87D4D494</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>WpfScoreboard_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>WpfScoreboard_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -200,6 +200,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="WpfScoreboard_1_TemporaryKey.pfx" />
     <None Include="WpfScoreboard_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
