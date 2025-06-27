@@ -10,7 +10,7 @@ A intelegent scoreboard that keeps track of score, person that should press the 
 
 Ethernet settings:  
 
-* IP Laptop / PC = `192.168.178.100`
+* IP Laptop / PC = `192.168.178.99`
 * IP Arduino = `192.168.178.98`
 
 ## MQTT API
