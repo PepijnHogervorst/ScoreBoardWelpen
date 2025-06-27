@@ -20,6 +20,10 @@ namespace WpfScoreboard
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Private properties
+        Classes.MqttBroker _broker = new Classes.MqttBroker();
+        #endregion
+
         #region Constructor
         public MainWindow()
         {
@@ -28,7 +32,7 @@ namespace WpfScoreboard
         #endregion
 
         #region Screen event methods
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Get settings and group points from database
             Globals.Storage.RetrieveData();
@@ -36,11 +40,18 @@ namespace WpfScoreboard
             // Set date to current date on pc
             Globals.Storage.CurrentDate = DateTimeOffset.Now;
             Globals.Storage.SettingsReplace(Classes.SettingNames.CurrentDate, DateTimeOffset.Now.ToString());
+
+            await _broker.Start();
+
+            // Start MQTT client
+            Globals.MQTTClient.Connect();
         }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        private async void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.CloseDevice();
+            await _broker.Stop();
+
+            Globals.MQTTClient.Close();
         }
         #endregion
 

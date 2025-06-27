@@ -34,9 +34,6 @@ namespace WpfScoreboard.Screens
             // Load points data from sql storage
             GetPoints();
             GetStartDate();
-
-            // Get comm ports
-            UpdateCommPorts();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -165,23 +162,6 @@ namespace WpfScoreboard.Screens
                 }
             }
         }
-
-        private void UpdateCommPorts()
-        {
-            string[] ports = SerialPort.GetPortNames();
-
-            this.CbCommPorts.Items.Clear();
-
-            foreach (string port in ports)
-            {
-                this.CbCommPorts.Items.Add(port);
-            }
-
-            // Get commport setting from settings 
-            string activePort = Globals.Storage.GetCommPort();
-            CbCommPorts.SelectedItem = activePort;
-        }
-
         #endregion
 
         

@@ -8,7 +8,7 @@ namespace WpfScoreboard
 {
     public class Globals
     {
-        public static Classes.Communication Communication   = new Classes.Communication();
+        public static Classes.MQTTClient MQTTClient         = new Classes.MQTTClient();
         public static Classes.Storage       Storage         = new Classes.Storage();
 
         public const int MaxNrOfGroups = 6;

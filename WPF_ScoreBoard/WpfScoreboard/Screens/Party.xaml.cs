@@ -26,6 +26,7 @@ namespace WpfScoreboard.Screens
             FullRainbow = 0,
             RandomRain,
             ColorWipe,
+            CollorCyclePillar,
         }
 
         private PartyProgram ActiveProgram = PartyProgram.FullRainbow;
@@ -33,19 +34,39 @@ namespace WpfScoreboard.Screens
         public Party()
         {
             InitializeComponent();
+
+            // Set brightness slider
+            if (Globals.MQTTClient.Brightness != -1)
+            {
+                SliderBrightness.Value = Globals.MQTTClient.Brightness;
+            }
         }
 
         #region Screen loading event methods
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.OpenSerialPort();
+            
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            Globals.Communication.ClearLEDs();
+            Globals.MQTTClient.ClearLEDs();
         }
         #endregion
+
+
+        #region Button events
+        private void BtnStrobe_Active(object sender, RoutedEventArgs e)
+        {
+            Globals.MQTTClient.SetStrobe(true, 100, 255, 0, 0, 20);
+        }
+
+        private void BtnStrobe_Inactive(object sender, MouseEventArgs e)
+        {
+            Globals.MQTTClient.SetStrobe(false, 100, 255, 0 ,0, 20);
+        }
+        #endregion
+
 
         #region Radio button event methods
         private void RbFullRainbow_Click(object sender, RoutedEventArgs e)
@@ -62,6 +83,11 @@ namespace WpfScoreboard.Screens
         {
             SetPartyProgram(PartyProgram.ColorWipe);
         }
+
+        private void RbColorCyclePerPillar_Click(object sender, RoutedEventArgs e)
+        {
+            SetPartyProgram(PartyProgram.CollorCyclePillar);
+        }
         #endregion
 
         #region Slider event methods
@@ -72,9 +98,7 @@ namespace WpfScoreboard.Screens
                 return;
             }
 
-            string value = ((int)SliderBrightness.Value).ToString("D3");
-            // Write value to controller
-            Globals.Communication.WriteSerial($"bxx{value}");
+            Globals.MQTTClient.SetBrightness((int)SliderBrightness.Value);
         }
 
         private void SliderStrobe_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -83,10 +107,8 @@ namespace WpfScoreboard.Screens
             {
                 return;
             }
-
-            string value = ((int)SliderStrobe.Value).ToString("D3");
-            // Write value to controller
-            Globals.Communication.WriteSerial($"Sxx{value}");
+            // Publish mqtt message
+            //Globals.MQTTClient.SetStrobe((int)SliderStrobe.Value);
         }
 
         private void SliderSpeed_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -99,12 +121,14 @@ namespace WpfScoreboard.Screens
         #region Private methods
         private void SetPartyProgram(PartyProgram program)
         {
-            string msg = "p" + ((int)program).ToString("D1") + ((int)SliderSpeed.Value).ToString("D2");
-            msg = msg.PadRight(6, '0');
-            Globals.Communication.WriteSerial(msg);
+            Globals.MQTTClient.SetParty((int)program, (int)SliderSpeed.Value);
             ActiveProgram = program;
         }
+
+
+
         #endregion
 
+        
     }
 }

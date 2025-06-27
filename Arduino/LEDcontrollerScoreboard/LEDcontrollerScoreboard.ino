@@ -1,8 +1,12 @@
 /************************************************************************/
 /*                               INCLUDES                               */
 /************************************************************************/
+#include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
 #include <EEPROM.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+#include <SPI.h>
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -70,8 +74,14 @@ bool messageReceived = false;
 bool IsPartyMode = false;
 bool IsArcadeBtnEnabled = false;
 bool PartyProgramChanged = true;
+bool reconnectTimerFlag = true;
 uint8_t PartyProgram = 0;
+uint8_t LED_Brightness = 0;
 uint16_t PartyDelayTime = 5;
+uint16_t strobe_delay = 500;
+uint32_t strobe_color = led_strip.Color(255,255,255);
+uint8_t strobe_brightness = 100;
+bool is_strobe_active = false;
 
 int GroupNr = 0;
 int Points = 0;
@@ -106,6 +116,33 @@ byte neopix_gamma[] = {
   144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
+
+// memory pools for JSON parsing
+StaticJsonDocument<256> doc_receive;
+StaticJsonDocument<256> doc_send;
+
+// Ethernet config arduino!
+byte mac[] = { 0xD1, 0xAD, 0xBE, 0xEF, 0xCE, 0xAA };
+// IPAddress ip(192, 168, 68, 90);
+// IPAddress server(192, 168, 68, 102);
+IPAddress ip(192, 168, 178, 98);
+IPAddress server(192, 168, 178, 99);
+
+EthernetClient ethClient;
+PubSubClient mqtt_client(ethClient);
+
+// MQTT config
+const char topic_button_prog[]  = "Scoreboard/ButtonProgram";
+const char topic_party[]        = "Scoreboard/Party";
+const char topic_brightness[]   = "Scoreboard/Brightness";
+const char topic_stop_party[]   = "Scoreboard/Clear";
+const char topic_strobe[]       = "Scoreboard/Strobe";
+
+const char topic_status[]       = "Scoreboard/Status";
+const char topic_ready[]        = "Scoreboard/Ready";
+
+// General variables
+unsigned long prev_keep_alive;
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -128,13 +165,23 @@ struct RainDrop_t
 /************************************************************************/
 /*                             PROTOTYPES                               */
 /************************************************************************/
-void DeciferMessage();
+// MQTT prototypes
+void callback(char* topic, byte* payload, unsigned int length);
+void reconnect();
+void keep_alive();
+void decipher_mqtt_message(char* topic, char payload[]);
+void mqtt_set_party();
+void mqtt_set_buttonprogram();
+void mqtt_set_brightness();
+void mqtt_stop_party();
+
 void WriteLedStrip();
 int groupNrToPin(int nr);
 int groupNrToOffset(int nr);
 uint32_t Wheel(byte WheelPos);
 void DebugLoop(void);
 void ClearLEDstrips(void);
+
 // Party prototypes
 void PartyLoop(void);
 void PP_Full_rainbow(void);
@@ -155,7 +202,6 @@ void ColorWipe(uint32_t color, int delayTime);
 void setup() {
   // Init serial communication:
   Serial.begin(115200);
-  Serial1.begin(9600);
 
   Serial.print("LEDcontrollerScoreboard ");
   Serial.println(SoftwareVersion);
@@ -166,19 +212,29 @@ void setup() {
   
   // Startup delay to let power supply stabilize
   delay(3000);
-  led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
 
   // Retrieve brightness from eeprom
-  int brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
+  LED_Brightness = EEPROM.read(BRIGHTNESS_ADDRESS);
   Serial.print("Brightness set to: ");
-  Serial.println(brightness);
-  if (brightness == 0)
+  Serial.println(LED_Brightness);
+  if (LED_Brightness == 0)
   {
-    brightness = BRIGHTNESS;
+    LED_Brightness = BRIGHTNESS;
   }
 
+  // Initialize MQTT config
+  mqtt_client.setServer(server, 1883);
+  mqtt_client.setCallback(callback);
+
+  // Start ethernet on static IP
+  Ethernet.begin(mac, ip);
+  Serial.print("Arduino ip=");
+  Serial.println(ip);
+
+
   // Init the led strip
-  led_strip.setBrightness(brightness);
+  led_strip = Adafruit_NeoPixel(NUM_OF_PIXELS, LED_GROUP_1, NEO_RGB  + NEO_KHZ800);
+  led_strip.setBrightness(LED_Brightness);
   led_strip.begin();
   led_strip.clear();
 
@@ -210,17 +266,16 @@ void setup() {
 /************************************************************************/
 void loop() {
   #ifndef DEBUG
-  // Check if serial message is received
-  if(messageReceived)
+  // Handle MQTT connection and keep alive
+  if (!mqtt_client.connected())
   {
-    // Handle event
-    Serial.println("Message received: " + inputString);
-    DeciferMessage();
-    
-    // Clear event
-    messageReceived = false;
-    inputString = "";
+    reconnect();
   }
+  mqtt_client.loop();
+
+  keep_alive();
+  
+  // Check what mode the arduino is in
   if (IsPartyMode)
   {
     PartyLoop();
@@ -229,7 +284,7 @@ void loop() {
   {
     if (digitalRead(BTN_ARCADE) == HIGH)
     {
-      delay(75);
+      delay(70);
       if (digitalRead(BTN_ARCADE) == HIGH)
       {
         WriteLedStrip();
@@ -254,33 +309,27 @@ void loop() {
 /************************************************************************/
 /*                              EVENTS                                  */
 /************************************************************************/
-void serialEvent1() 
+// MQTT callback when message on subscribed topic is received
+void callback(char* topic, byte* payload, unsigned int length) 
 {
-  static unsigned long prevEventTime = 0;
-  unsigned long currentTime = millis();
-  
-  
-  while (Serial1.available()) 
+  // Cast payload to string
+  char content[length] = "";
+  char character;
+  for (int num = 0; num < length; num++) 
   {
-    // get the new byte:
-    char inChar = (char)Serial1.read();
-    // add it to the inputString:
-    inputString += inChar;
-
-    //if inputstring is length 6, the full message is received so signal 
-    if (inputString.length() >= 6) 
-    {
-      messageReceived = true;
-    }
-
-    if ((currentTime - prevEventTime) > 750 ||
-       (((prevEventTime + 750) > currentTime) && prevEventTime > currentTime))
-    {
-      inputString = "";
-      Serial.println("Purged serial input buffer");
-    }
+    //character = payload[num];
+    content[num] = payload[num];
   }
-  prevEventTime = millis();
+
+  Serial.println();
+  Serial.println("Received msg!");
+  Serial.print("Topic: ");
+  Serial.println(topic);
+  Serial.print("Payload: ");
+  Serial.println(content);
+
+  // Parse payload
+  decipher_mqtt_message(topic, content);
 }
 /************************************************************************/
 /*                                                                      */
@@ -289,86 +338,233 @@ void serialEvent1()
 /************************************************************************/
 /*                              FUNCTIONS                               */
 /************************************************************************/
-// Function where most of the magic happens, 
-// decifers serial input and sets leds using a color wheel
-void DeciferMessage()
+#pragma region MQTT methods
+void reconnect() 
 {
-  uint8_t program;
-  String BufPartyTime;
-  char functionChar = inputString.charAt(0);
-  
-  // Check first char if msg is led command or brightness or else
-  switch (functionChar)
+  // Loop until we're reconnected
+  if (!mqtt_client.connected()) 
   {
-    case 'g':
-      // Reset party mode on serial receiving
-      if (IsPartyMode)
-      {
-        Serial.println("Party canceled..");
-        ClearLEDstrips();
-      }
-      IsPartyMode = false;
-
-      // Enable the button, when pressed write ledstrip
-      EnableArcadeButton();
-      break;
-
-    case 'b':
-      // Led program
-      SetLEDBrightness();
-      break;
-
-    case 'p':
-      // Pary mode!
-      IsPartyMode = true;
-      // Get program number 
-      program = inputString.charAt(1) - '0';
-      // Get party speed (delay time in ms)
-      BufPartyTime = inputString.substring(2, 4); 
-      PartyDelayTime = BufPartyTime.toInt();
-      if (PartyDelayTime > 99 || PartyDelayTime == 0)
-      {
-        PartyDelayTime = 5;
-      }
-      Serial.print("Party Delay Time = ");
-      Serial.println(PartyDelayTime);
-
-      if (program >= 0 && program < 9)
-      {
-        if (program != PartyProgram)
-        {
-          ClearLEDstrips();
-          PartyProgram = program;
-          PartyProgramChanged = true;
-        }
-      }
-      break;
-
-    case 's':
-      IsPartyMode = false;
-      Serial.println("Party canceled..");
-      ClearLEDstrips();
-      break;
+    // Only try to reconnect once every 4 seconds
+    if (!reconnectTimerFlag) return;
     
-    case 'S': 
-      // Strobe value
-      break;
+    reconnectTimerFlag = false;
+    // Attempt to connect
+    if (mqtt_client.connect("arduinoClient")) 
+    {
+      Serial.println("Connected to MQTT broker!");
+      
+      // Once connected, resubscribe to topics:
+      mqtt_client.subscribe(topic_button_prog);
+      mqtt_client.subscribe(topic_party);
+      mqtt_client.subscribe(topic_brightness);
+      mqtt_client.subscribe(topic_stop_party);
+      mqtt_client.subscribe(topic_strobe);
+      
+      // Publish status / keep alive in JSON format
+      char send_buf[100];
 
-    case 'c':
-      Serial.println("Clearing ledstrips");
-      if (IsPartyMode)
-      {
-        
-        ClearLEDstrips();
-      }
-      IsPartyMode = false;
-      ClearLEDstrips();
-      break;
-  
-    default:
-      break;
+      doc_send.clear();
+      doc_send["State"] = "Alive";
+      doc_send["Brightness"] = LED_Brightness;
+      doc_send["Version"] = SoftwareVersion;
+
+      serializeJson(doc_send, send_buf);
+      mqtt_client.publish(topic_status, send_buf);
+    } 
+    else 
+    {
+      Serial.print("failed to connect to mqtt broker, rc=");
+      Serial.print(mqtt_client.state());
+      Serial.print(" ip server=");
+      Serial.println(server);
+    }
   }
 }
+
+void keep_alive()
+{
+  static uint8_t reconnectCounter = 0;
+  unsigned long current_time = millis();
+
+  // Check time elapsed is more than 1 sec
+  if ((current_time - prev_keep_alive) >= 1000)
+  {
+    char send_buf[100];
+    doc_send.clear();
+    doc_send["State"] = "Alive";
+    doc_send["Brightness"] = LED_Brightness;
+    doc_send["Version"] = SoftwareVersion;
+
+    // Publish alive message
+    if (mqtt_client.connected())
+    {
+      serializeJson(doc_send, send_buf);
+      mqtt_client.publish(topic_status, send_buf);
+    }
+
+    // Update prev time
+    prev_keep_alive = current_time;
+
+    if (reconnectCounter >= 3)
+    {
+      reconnectCounter = 0;
+      reconnectTimerFlag = true;
+    }
+    else
+    {
+      reconnectCounter++;
+    }
+  }
+}
+
+void decipher_mqtt_message(char* topic, char payload[])
+{
+  // Deserialize json
+  DeserializationError exception = deserializeJson(doc_receive, payload);
+  
+  // Check for succes of deserialization
+  if (exception)
+  {
+    Serial.println("Failed to deserialize JSON..");
+    return;
+  }
+
+  // Compare topic!
+  if (strcmp(topic, topic_party) == 0)
+  {
+    mqtt_set_party();
+  }
+  else if (strcmp(topic, topic_button_prog) == 0)
+  {
+    mqtt_set_buttonprogram();
+  }
+  else if (strcmp(topic, topic_brightness) == 0)
+  {
+    mqtt_set_brightness();
+  }
+  else if (strcmp(topic, topic_stop_party) == 0)
+  {
+    mqtt_stop_party();
+  }
+  else if (strcmp(topic, topic_strobe) == 0)
+  {
+    mqtt_set_strobe();
+  }
+}
+
+void mqtt_set_party()
+{
+  // Set Party mode!
+  IsPartyMode = true;
+
+  // Clear score if set
+  IsArcadeBtnEnabled = false;
+  digitalWrite(BTN_INDICATOR, LOW);
+
+  // Get the program nr and delay time
+  uint8_t program = doc_receive["Program"];
+  uint8_t delay = doc_receive["Delay"];
+
+  // Set delay limits
+  if (delay > 99)
+  {
+    delay = 99;
+  }
+  else if (delay == 0)
+  {
+    delay = 5;
+  }
+  
+  // Set program 
+  if (program >= 0 && program < 9)
+  {
+    if (program != PartyProgram || 
+        delay != PartyDelayTime)
+    {
+      ClearLEDstrips();
+      PartyProgram = program;
+      PartyDelayTime = delay;
+      PartyProgramChanged = true;
+
+      Serial.print("Next level party: ");
+      Serial.println(program);
+      Serial.print("BPM:");
+      Serial.println(delay);
+    }
+  }
+}
+
+void mqtt_set_buttonprogram()
+{
+  if (IsPartyMode)
+  {
+    Serial.println("Party canceled..");
+    ClearLEDstrips();
+  }
+  IsPartyMode = false;
+  IsArcadeBtnEnabled = true;
+
+  // Set LED in arcade button to signal it is active
+  digitalWrite(BTN_INDICATOR, HIGH);
+
+  GroupNr = doc_receive["Group"];
+  Points = doc_receive["Points"];
+
+  // Check limits of points
+  if (Points > led_strip.numPixels())
+  {
+    Points = led_strip.numPixels();
+  }
+  else if (Points < 0)
+  {
+    Points = 0;
+  }
+}
+
+void mqtt_set_brightness()
+{
+  uint8_t bright = doc_receive["Brightness"];
+
+  // Update ledstrip brightness
+  led_strip.setBrightness(bright);
+  LED_Brightness = bright;
+
+  // Save brightness in eeprom
+  EEPROM.write(BRIGHTNESS_ADDRESS, bright);
+
+  // Log to console
+  Serial.println();
+  Serial.print("Brightness set to: ");
+  Serial.println(bright);
+  Serial.println();
+}
+
+void mqtt_stop_party()
+{
+  Serial.println("Party is over BOYS.. Clearing ledstrips");
+  IsPartyMode = false;
+  ClearLEDstrips();
+}
+
+void mqtt_set_strobe()
+{
+  strobe_brightness = doc_receive["Brightness"];
+  strobe_color = doc_receive["Color"];
+  strobe_delay = doc_receive["Time"];
+  is_strobe_active = doc_receive["Active"];
+
+  if (is_strobe_active)
+  {
+    Serial.println("Strobe ACTIVE!");
+  }
+  else
+  {
+    Serial.println("Strobe OFFLINE!");
+  }
+  
+  
+}
+#pragma endregion
 
 void EnableArcadeButton()
 {
@@ -448,23 +644,19 @@ void WriteLedStrip()
   }
   while(loopCount <= Points);
 
-  Serial.println("LEDS set! Waiting for new serial command..");
+  Serial.println("LEDS set! Waiting for new command..");
 
-  Serial1.print("DONE");
-}
-
-void SetLEDBrightness()
-{
-  String buf = inputString.substring(3);
-  int bright = buf.toInt();
-  led_strip.setBrightness(bright);
-  EEPROM.write(BRIGHTNESS_ADDRESS, bright);
-
-  Serial.println();
-  Serial.print("Brightness set to: ");
-  Serial.println(bright);
-  Serial.println("Waiting for new serial command..");
-  Serial.println();
+  // Create ready msg in JSON format
+  char send_buf[100];
+  doc_send.clear();
+  doc_send["Ready"] = true;
+  
+  // Publish ready message
+  if (mqtt_client.connected())
+  {
+    serializeJson(doc_send, send_buf);
+    mqtt_client.publish(topic_ready, send_buf);
+  }
 }
 
 int groupNrToPin(int nr)
@@ -564,37 +756,70 @@ void ClearLEDstrips()
 #pragma region PARTY PROGRAM FUNCTIONS
 void PartyLoop(void)
 {
+  static bool was_strobe_active = true;
+  if (is_strobe_active)
+  {
+    was_strobe_active = true;
+    PP_Strobe();
+    return;
+  }
+
+  if (was_strobe_active)
+  {
+    led_strip.setBrightness(LED_Brightness);
+    was_strobe_active = false;
+  }
+  
+
   switch (PartyProgram)
   {
-  case 0:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Full Rainbow Party!!");
-    }
-    PP_Full_Rainbow();
-    break;
+    case 0:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Full Rainbow Party!!");
+      }
+      PP_Full_Rainbow();
+      break;
   
-  case 1:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Random Rain Party!!");
-    }
-    PP_Random_Rain();
-    break;
+    case 1:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Random Rain Party!!");
+      }
+      PP_Random_Rain();
+      break;
 
-  case 2:
-    if (PartyProgramChanged)
-    {
-      PartyProgramChanged = false;
-      Serial.println("Color Wipes Party!!");
-    }
-    PP_ColorWipes();
-    break;
+    case 2:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Color Wipes Party!!");
+      }
+      PP_ColorWipes();
+      break;
 
-  default:
-    break;
+    case 3:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("WOW single color rainbow!!");
+      }
+      PP_Rainbow_Single_Color();
+      break;
+    
+    case 4:
+      if (PartyProgramChanged)
+      {
+        PartyProgramChanged = false;
+        Serial.println("Undefined program for now..");
+      }
+      
+      break;
+
+    default:
+      break;
   }
   
 }
@@ -724,6 +949,107 @@ void ColorWipe(uint32_t color, int delayTime)
     led_strip.show();
     delay(delayTime);
   }
+}
+
+void PP_Falling_Rain(void)
+{
+  
+}
+
+void PP_Rainbow_Single_Color(void)
+{
+  static uint16_t colorOffset = 0; 
+  int ledPin = 0;
+  int groupOffset = 0;
+  uint16_t ledStart = 0;
+  uint32_t color;
+
+  // Check if offset is at end of led total count
+  if (colorOffset >= 255)
+  {
+    colorOffset = 0;
+  }
+
+  // Loop through all led strips
+  for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
+  {
+    ledPin = groupNrToPin(groupCount);
+    groupOffset = groupNrToOffset(groupCount);
+    
+    led_strip.setPin(ledPin);
+    // Each led strip has his own start point 
+    ledStart = groupOffset + colorOffset;
+    color = Wheel((ledStart) & 0xFF);
+
+    for (uint16_t i = 0; i < led_strip.numPixels(); i++)
+    {
+      led_strip.setPixelColor(i, color);
+    }
+    led_strip.show();
+  }
+  delay(PartyDelayTime);
+  
+  colorOffset++;
+}
+
+void PP_Strobe(void)
+{
+  // Keep track of time to toggle strobe 
+  static unsigned long prev_time = 0;
+  static bool toggle = false;
+  static uint8_t brightness;
+
+  unsigned long curr_time = millis();
+
+  
+
+  if (curr_time > prev_time)
+  {
+    if (curr_time - prev_time >= strobe_delay)
+    {
+      // Strobe must never work on full brightness
+      if (LED_Brightness > 150)
+      {
+        led_strip.setBrightness(150);
+      }
+
+      // Update prev time 
+      prev_time = curr_time;
+
+      // Toggle leds
+      uint32_t color;
+      if (toggle)
+      {
+        color = strobe_color;
+      }
+      else
+      {
+        color = led_strip.Color(0,0,0);
+      }
+      for (uint8_t groupCount = 1; groupCount <= NUM_OF_GROUPS; groupCount++)
+      {
+        // set correct pin
+        led_strip.setPin(groupNrToPin(groupCount));
+
+        // Set color of tower
+        for (uint16_t i = 0; i < led_strip.numPixels(); i++)
+        {
+          led_strip.setPixelColor(i, color);
+        }
+        led_strip.show();
+      }
+
+      // Toggle the on / off state
+      toggle = !toggle;
+    }
+  }
+  else
+  {
+    // Catch overflow by ignoring it (approx once in 50 days)
+    prev_time = curr_time;
+  }
+  
+  
 }
 #pragma endregion
 

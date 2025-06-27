@@ -52,24 +52,39 @@ namespace WpfScoreboard.Screens
             // Set UI elements
             this.TxtPoints.Visibility = Visibility.Collapsed;
             this.SpOverview.Visibility = Visibility.Collapsed;
+
+            Globals.MQTTClient.ClearLEDs();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             this.UnhookEvents();
-            Globals.Communication.CloseDevice();
         }
         #endregion
 
         #region Event handling methods
         private void HookEvents()
         {
-            Globals.Communication.DataReceived += Communication_DataReceived;
+            Globals.MQTTClient.OnReadyReceived += MQTTClient_OnReadyReceived;
         }
 
         private void UnhookEvents()
         {
-            Globals.Communication.DataReceived -= Communication_DataReceived;
+            Globals.MQTTClient.OnReadyReceived -= MQTTClient_OnReadyReceived;
+        }
+
+        private void MQTTClient_OnReadyReceived(object sender, EventArgs e)
+        {
+            // When ready is received, set the points total visible,
+            // Arduino is done when serial is send
+            Dispatcher.Invoke(() =>
+            {
+                this.TxtPoints.Visibility = Visibility.Visible;
+                this.TxtPressBtn.Visibility = Visibility.Collapsed;
+            });
+
+            // Start timer to show new group after x seconds
+            timer.Start();
         }
 
         private void Communication_DataReceived(object sender, EventArgs e)
@@ -140,7 +155,7 @@ namespace WpfScoreboard.Screens
         {
             Globals.GroupTurn = 1;
             // Clear LEDS
-            Globals.Communication.ClearLEDs();
+            Globals.MQTTClient.ClearLEDs();
 
             await Task.Delay(1000);
 
@@ -191,7 +206,7 @@ namespace WpfScoreboard.Screens
 
             if (days_diff < 0)
             {
-                days_diff = System.Math.Abs(days_diff);
+                days_diff = Math.Abs(days_diff);
             }
             List<Classes.Groups> myGroup = GetGroup(Globals.GroupTurn);
             if (myGroup.Count == 0)
@@ -274,7 +289,9 @@ namespace WpfScoreboard.Screens
                     break;
                 }
             }
-            Globals.Communication.SetLeds(Globals.GroupTurn, pointsToWrite);
+            // Write score to arduino over MQTT
+            Globals.MQTTClient.SetScore(Globals.GroupTurn, pointsToWrite);
+
             this.TxtPoints.Visibility = Visibility.Collapsed;
             this.TxtPoints.Text = pointsToWrite.ToString();
         }
@@ -314,9 +331,10 @@ namespace WpfScoreboard.Screens
 
         private string ShowWinner()
         {
-            string retVal = "Gefeliciteerd groepje ";
-            Classes.Points highestPoints = new Classes.Points();
-            highestPoints.GroupPoints = 0;
+            Classes.Points highestPoints = new Classes.Points
+            {
+                GroupPoints = 0
+            };
             // Loop through all groups to get points
             foreach (Classes.Points groupPoints in points)
             {
@@ -326,12 +344,8 @@ namespace WpfScoreboard.Screens
                 }
             }
 
-            retVal += highestPoints.GroupNr + "!!!";
-
-            return retVal;
+            return $"Gefeliciteerd groepje {highestPoints.GroupNr}!!!";
         }
         #endregion
-
-
     }
 }
