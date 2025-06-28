@@ -1,18 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO.Ports;
 
 namespace WpfScoreboard.Screens
 {
@@ -115,34 +105,34 @@ namespace WpfScoreboard.Screens
         {
             object objToFind;
             int count = 1;
-            bool grpFound;
             GroupPoints = Globals.Storage.GetPoints("*");
+            TextBlock textPrevious = null;
+
             do
             {
-                objToFind = this.FindName("TxtBoxGroup" + count.ToString());
-                if (objToFind != null)
+                objToFind = FindName($"TxtPreviousPoints{count}");
+                textPrevious = objToFind is TextBlock ? (TextBlock)objToFind : null;
+
+                objToFind = FindName("TxtBoxGroup" + count.ToString());
+                if (objToFind is TextBox textBox)
                 {
-                    if (objToFind is TextBox textBox)
+                    // If sql doesn't contain a row for the group create an entrie
+                    Classes.Points group = GroupPoints.FirstOrDefault(p => p.GroupNr == count);
+                    if (group is null)
                     {
-                        grpFound = false;
-                        // If sql doesn't contain a row for the group create an entrie
-                        foreach (Classes.Points points in GroupPoints)
-                        {
-                            if (points.GroupNr == count)
-                            {
-                                grpFound = true;
-                                textBox.Text = points.GroupPoints.ToString();
-                                break;
-                            }
-                        }
-                        if (!grpFound)
-                        {
-                            // Add entrie of group in database.
-                            Globals.Storage.ReplacePoints(count, 0);
-                            textBox.Text = "0";
-                        }
+                        Globals.Storage.ReplacePoints(count, 0);
+                        textBox.Text = "0";
+                        textPrevious.Text = "0";
+                        continue;
+                    }
+
+                    textBox.Text = group.GroupPoints.ToString();
+                    if (textPrevious != null)
+                    {
+                        textPrevious.Text = group.GroupPoints.ToString();
                     }
                 }
+
                 count++;
             } while (objToFind != null);
         }
@@ -164,6 +154,6 @@ namespace WpfScoreboard.Screens
         }
         #endregion
 
-        
+
     }
 }
