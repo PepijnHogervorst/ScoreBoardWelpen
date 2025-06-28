@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using WelpenScoreboard.WpfUI.ViewModels;
 
 namespace WelpenScoreboard.WpfUI.Views;
 
@@ -7,8 +8,9 @@ namespace WelpenScoreboard.WpfUI.Views;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainViewModel mainViewModel)
     {
         InitializeComponent();
+        DataContext = mainViewModel;
     }
 }

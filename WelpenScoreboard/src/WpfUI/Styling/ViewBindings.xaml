@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:WelpenScoreboard.WpfUI.ViewModels"
+                    xmlns:views="clr-namespace:WelpenScoreboard.WpfUI.Views">
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+        <views:DashboardView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
+        <views:ConfigurationView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:GroupSetupViewModel}">
+        <views:GroupSetupView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:PartyViewModel}">
+        <views:PartyView />
+    </DataTemplate>
+</ResourceDictionary>
