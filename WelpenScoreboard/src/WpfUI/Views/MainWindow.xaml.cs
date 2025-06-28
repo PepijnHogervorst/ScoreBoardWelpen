@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace WelpenScoreboard.WpfUI;
+namespace WelpenScoreboard.WpfUI.Views;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml

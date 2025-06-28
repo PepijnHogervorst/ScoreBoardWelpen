@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using WelpenScoreboard.WpfUI.Views;
 
 namespace WelpenScoreboard.WpfUI;
 
@@ -24,7 +25,7 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        MainWindow window = _serviceProvider.GetRequiredService<MainWindow>();
+        var window = _serviceProvider.GetRequiredService<MainWindow>();
         window.Show();
     }
 
