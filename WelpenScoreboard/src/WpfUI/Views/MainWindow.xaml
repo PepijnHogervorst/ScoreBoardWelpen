@@ -5,12 +5,112 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WelpenScoreboard.WpfUI.Views"
         xmlns:vm="clr-namespace:WelpenScoreboard.WpfUI.ViewModels"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Style="{StaticResource MaterialDesignWindow}"
         mc:Ignorable="d"
-        Title="Welpen Scorebord" Height="450" Width="800">
+        Title="Welpen Scorebord"
+        Height="450"
+        Width="800">
     <Grid>
-        <ItemsControl ItemsSource="{Binding Tabs}">
-            
-        </ItemsControl>
+        <materialDesign:DialogHost DialogTheme="Inherit"
+                                   Identifier="RootDialog"
+                                   SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">
+
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+                <materialDesign:DrawerHost.LeftDrawerContent>
+                    <DockPanel MinWidth="220">
+                        <ToggleButton Margin="16"
+                                      HorizontalAlignment="Right"
+                                      DockPanel.Dock="Top"
+                                      IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}"
+                                      Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+
+                        <ListBox x:Name="DemoItemsListBox"
+                                 Margin="0,16,0,16"
+                                 ItemsSource="{Binding Tabs}"
+                                 PreviewMouseLeftButtonUp="DemoItemsListBox_PreviewMouseLeftButtonUp"
+                                 SelectedIndex="{Binding SelectedIndex}"
+                                 SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+                            <ListBox.Resources>
+                                <Style TargetType="ScrollBar"
+                                       BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" />
+                            </ListBox.Resources>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="24,4,0,4"
+                                               AutomationProperties.AutomationId="DemoItemPage"
+                                               Text="{Binding Title}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </materialDesign:DrawerHost.LeftDrawerContent>
+
+                <DockPanel>
+                    <materialDesign:ColorZone Padding="16"
+                                              materialDesign:ElevationAssist.Elevation="Dp4"
+                                              DockPanel.Dock="Top"
+                                              Mode="PrimaryMid">
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton x:Name="MenuToggleButton"
+                                              IsChecked="False"
+                                              Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
+                            </StackPanel>
+
+                            <materialDesign:PopupBox DockPanel.Dock="Right"
+                                                     PlacementMode="BottomAndAlignRightEdges"
+                                                     StaysOpen="False">
+
+                                <StackPanel>
+                                    <Grid Margin="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Margin="0,0,10,0"
+                                                   Text="{Binding SoftwareVersion}" />
+                                    </Grid>
+                                </StackPanel>
+                            </materialDesign:PopupBox>
+
+                            <TextBlock Margin="0,0,0,0"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="24"
+                                       Text="Welpen scorebord!" />
+                        </DockPanel>
+                    </materialDesign:ColorZone>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ScrollViewer x:Name="MainScrollViewer"
+                                      Grid.Row="1"
+                                      materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
+                                      HorizontalScrollBarVisibility="{Binding SelectedItem.HorizontalScrollBarVisibilityRequirement, FallbackValue=Auto}"
+                                      VerticalScrollBarVisibility="{Binding SelectedItem.VerticalScrollBarVisibilityRequirement, FallbackValue=Auto}">
+                            <ContentControl Content="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, FallbackValue={x:Null}}"
+                                            DataContextChanged="OnSelectedItemChanged" />
+                        </ScrollViewer>
+
+                        <materialDesign:Snackbar x:Name="MainSnackbar"
+                                                 Grid.Row="1"
+                                                 MessageQueue="{materialDesign:MessageQueue}" />
+                    </Grid>
+                </DockPanel>
+            </materialDesign:DrawerHost>
+        </materialDesign:DialogHost>
     </Grid>
 </Window>
