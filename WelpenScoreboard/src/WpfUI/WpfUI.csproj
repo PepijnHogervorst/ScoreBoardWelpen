@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\bgGold.jpg" />
+    <None Remove="Images\StoreLogo.scale-400.ico" />
+    <None Remove="Images\StoreLogo.scale-400.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.6" />
@@ -28,6 +34,12 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\bgGold.jpg" />
+    <Resource Include="Images\StoreLogo.scale-400.ico" />
+    <Resource Include="Images\StoreLogo.scale-400.png" />
   </ItemGroup>
 
 </Project>
