@@ -1,4 +1,5 @@
 ﻿using MQTTnet.Server;
+using System.Diagnostics;
 using WelpenScoreboard.Application.Mqtt;
 
 namespace WelpenScoreboard.Infrastructure.Mqtt;
@@ -16,18 +17,19 @@ public class MqttNetBroker : IMqttBroker
     {
         if (_mqttServer != null) return;
 
-        var mqttServerOptions = new MqttServerOptionsBuilder()
-            .WithDefaultEndpointPort(1883)
-            .Build();
+        var mqttServerFactory = new MqttServerFactory();
+        var mqttServerOptions = mqttServerFactory.CreateServerOptionsBuilder()
+                                                 .WithDefaultEndpoint()
+                                                 .Build();
 
         try
         {
-            _mqttServer = new MqttServerFactory().CreateMqttServer(mqttServerOptions);
+            _mqttServer = mqttServerFactory.CreateMqttServer(mqttServerOptions);
             await _mqttServer.StartAsync();
         }
         catch (Exception)
         {
-
+            Debug.WriteLine("Failed to start MQTT broker..");
         }
     }
 

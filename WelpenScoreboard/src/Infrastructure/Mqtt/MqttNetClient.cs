@@ -1,11 +1,14 @@
 ﻿using System.Text;
 using WelpenScoreboard.Application.Mqtt;
+using WelpenScoreboard.Application.Mqtt.Events;
 
 namespace WelpenScoreboard.Infrastructure.Mqtt;
 internal class MqttNetClient : IMqttClient
 {
     private readonly MQTTnet.IMqttClient _client;
     private readonly MQTTnet.MqttClientFactory _factory;
+    private Func<MqttMessageReceivedEventArgs, Task>? _funcOnMessageReceived;
+
 
     public MqttNetClient()
     {
@@ -26,10 +29,15 @@ internal class MqttNetClient : IMqttClient
 
         var options = new MQTTnet.MqttClientOptionsBuilder()
              .WithClientId("WelpenScoreboardClient")
-             .WithTcpServer("localhost", 1883)
+             .WithTcpServer("127.0.0.1", 1883)
              .Build();
         var result = await _client.ConnectAsync(options, CancellationToken.None);
         return result.ResultCode == MQTTnet.MqttClientConnectResultCode.Success;
+    }
+
+    public void SetCallback(Func<MqttMessageReceivedEventArgs, Task> funcOnMessageReceived)
+    {
+        _funcOnMessageReceived = funcOnMessageReceived;
     }
 
     public async Task CloseAsync()
@@ -40,44 +48,47 @@ internal class MqttNetClient : IMqttClient
             .Build());
     }
 
-    public async Task PublishAsync(string topic, string message)
+    public async Task<bool> PublishAsync(string topic, string message)
     {
-        if (!_client.IsConnected) return;
+        if (!_client.IsConnected) return false;
 
         try
         {
-            await _client.PublishAsync(
+            var result = await _client.PublishAsync(
                 new MQTTnet.MqttApplicationMessageBuilder()
                     .WithTopic(topic)
                     .WithPayload(Encoding.UTF8.GetBytes(message))
                     .Build());
-
+            return result.IsSuccess;
         }
         catch (Exception)
         {
-
+            return false;
         }
     }
 
-    public async Task SubscribeAsync(string topic)
+    public async Task<bool> SubscribeAsync(string topic)
     {
-        if (!_client.IsConnected) return;
+        if (!_client.IsConnected) return false;
 
         try
         {
             var subscribeOptions = _factory.CreateSubscribeOptionsBuilder()
                 .WithTopicFilter(f => f.WithTopic(topic))
                 .Build();
-            await _client.SubscribeAsync(subscribeOptions);
+            var result = await _client.SubscribeAsync(subscribeOptions);
+            return result.Items.Count > 0 && result.Items.First().ResultCode == MQTTnet.MqttClientSubscribeResultCode.GrantedQoS0;
         }
         catch (Exception)
         {
             // Handle exceptions as needed
+            return false;
         }
     }
 
-    private Task OnApplicationMessageReceivedAsync(MQTTnet.MqttApplicationMessageReceivedEventArgs arg)
+    private async Task OnApplicationMessageReceivedAsync(MQTTnet.MqttApplicationMessageReceivedEventArgs arg)
     {
-        throw new NotImplementedException();
+        if (_funcOnMessageReceived is null) return;
+        await _funcOnMessageReceived(new(arg.ApplicationMessage.Topic, Encoding.UTF8.GetString(arg.ApplicationMessage.Payload)));
     }
 }
