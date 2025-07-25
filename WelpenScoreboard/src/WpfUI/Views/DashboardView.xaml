@@ -74,7 +74,7 @@
                 Content="Opnieuw"
                 Foreground="White"
                 Margin="5"
-                Visibility="Collapsed" />
+                Visibility="{Binding CanStart, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
 
         <TextBlock x:Name="TxtPoints"
                    HorizontalAlignment="Center"
@@ -140,6 +140,8 @@
 
         <Button x:Name="BtnStart"
                 Content="Klik hier om te starten"
+                Command="{Binding StartCommand}"
+                Visibility="{Binding CanStart, Converter={StaticResource BoolToVisibilityConverter}}"
                 Grid.Row="2"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
