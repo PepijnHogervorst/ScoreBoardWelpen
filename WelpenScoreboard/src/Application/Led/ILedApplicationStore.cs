@@ -9,6 +9,10 @@ public interface ILedApplicationStore
     DateTimeOffset LastUpdated { get; }
     bool IsConnected { get; set; }
     string IsConnectedText { get; }
+    int GroupTurn { get; set; }
 
+    event EventHandler<EventArgs>? OnArduinoReady;
+
+    void SignalThatArduinoIsReady();
     void UpdateStatus(StatusData statusData);
 }

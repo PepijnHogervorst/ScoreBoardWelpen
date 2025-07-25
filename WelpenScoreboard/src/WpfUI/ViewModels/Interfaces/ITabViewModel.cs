@@ -1,4 +1,5 @@
-﻿namespace WelpenScoreboard.WpfUI.ViewModels.Interfaces;
+﻿
+namespace WelpenScoreboard.WpfUI.ViewModels.Interfaces;
 public interface ITabViewModel
 {
     /// <summary>
@@ -6,4 +7,6 @@ public interface ITabViewModel
     /// </summary>
     string Title { get; }
     int Order { get; }
+    ICommand ViewLoadCommand { get; }
+    ICommand ViewUnloadCommand { get; }
 }

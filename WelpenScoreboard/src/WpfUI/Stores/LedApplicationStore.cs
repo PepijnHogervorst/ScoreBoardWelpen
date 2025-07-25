@@ -6,8 +6,11 @@ internal class LedApplicationStore : ViewModelBase, ILedApplicationStore
 {
     private string _status = "Not Connected";
     private int _brightness = 0;
+    private int _groupTurn = 0;
     private string _arduinoVersion = "Unknown";
     private bool _isConnected;
+
+    public event EventHandler<EventArgs>? OnArduinoReady;
 
     public string Status
     {
@@ -58,6 +61,16 @@ internal class LedApplicationStore : ViewModelBase, ILedApplicationStore
 
     public string IsConnectedText => IsConnected ? $"Connected ({Status})" : "Not Connected";
 
+    public int GroupTurn
+    {
+        get => _groupTurn;
+        set
+        {
+            _groupTurn = value;
+            OnPropertyChanged(nameof(GroupTurn));
+        }
+    }
+
     public void UpdateStatus(StatusData statusData)
     {
         Status = statusData.State;
@@ -66,4 +79,6 @@ internal class LedApplicationStore : ViewModelBase, ILedApplicationStore
         LastUpdated = DateTimeOffset.Now;
         IsConnected = true;
     }
+
+    public void SignalThatArduinoIsReady() => OnArduinoReady?.Invoke(this, EventArgs.Empty);
 }

@@ -16,15 +16,19 @@ internal class ScoreboardReadyTopicParser : IMqttTopicParser
         _ledStore = ledStore;
     }
 
-    public async Task ParseAsync(string json)
+    public Task ParseAsync(string json)
     {
         try
         {
-
+            // Signal to the application that the scoreboard is ready
+            // Don't worry about the JSON content, we just need to know that the Arduino is ready
+            _ledStore.SignalThatArduinoIsReady();
+            return Task.CompletedTask;
         }
         catch (Exception)
         {
 
         }
+        return Task.CompletedTask;
     }
 }

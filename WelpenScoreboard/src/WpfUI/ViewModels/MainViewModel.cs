@@ -21,7 +21,9 @@ public class MainViewModel : ViewModelBase
         get => _selectedItem;
         set
         {
+            _selectedItem?.ViewUnloadCommand.Execute(null);
             _selectedItem = value;
+            _selectedItem?.ViewLoadCommand.Execute(null);
             OnPropertyChanged(nameof(SelectedItem));
         }
     }

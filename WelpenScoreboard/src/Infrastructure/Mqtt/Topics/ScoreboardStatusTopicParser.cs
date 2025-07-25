@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using WelpenScoreboard.Application.Led;
 using WelpenScoreboard.Application.Mqtt;
 using WelpenScoreboard.Application.Mqtt.Json;
@@ -8,29 +9,36 @@ internal class ScoreboardStatusTopicParser : IMqttTopicParser
 {
     private readonly IMqttSettings _mqttSettings;
     private readonly ILedApplicationStore _ledStore;
+    private readonly ILogger<ScoreboardStatusTopicParser> _logger;
+
+    private bool _hasLoggedError = false;
 
     public string Topic => "Scoreboard/Status";
 
     public ScoreboardStatusTopicParser(IMqttSettings mqttSettings,
-                                       ILedApplicationStore ledStore)
+                                       ILedApplicationStore ledStore,
+                                       ILogger<ScoreboardStatusTopicParser> logger)
     {
         _mqttSettings = mqttSettings;
         _ledStore = ledStore;
+        _logger = logger;
     }
 
-    public async Task ParseAsync(string json)
+    public Task ParseAsync(string json)
     {
         try
         {
             var statusData = JsonSerializer.Deserialize<StatusData>(json, _mqttSettings.SerializerOptions);
-            if (statusData is null) return;
+            if (statusData is null) return Task.CompletedTask;
 
             _ledStore.UpdateStatus(statusData);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            if (_hasLoggedError) return Task.CompletedTask;
+            _hasLoggedError = true;
+            _logger.LogError(ex, "Unable to parse status data from Arduino..");
         }
+        return Task.CompletedTask;
     }
 }
