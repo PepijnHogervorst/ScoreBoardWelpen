@@ -1,0 +1,24 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:WelpenScoreboard.WpfUI.Converters">
+    <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"
+                                             True="Visible"
+                                             False="Collapsed" />
+    <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"
+                                             True="Collapsed"
+                                             False="Visible" />
+    <converters:BooleanToVisibilityConverter x:Key="BoolToVisibleHiddenConverter"
+                                             True="Visible"
+                                             False="Hidden" />
+    <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibleHiddenConverter"
+                                             True="Hidden"
+                                             False="Visible" />
+
+    <converters:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
+    <converters:EnumToCollectionConverter x:Key="EnumToItemsSourceConverter" />
+    <converters:BooleanToFontWeightConverter x:Key="BoolToFontWeightBoldConverter"
+                                             True="Bold"
+                                             False="Normal" />
+    <converters:NullableBooleanToLedStateConverter x:Key="NullableBoolToLedStateConverter" />
+    <converters:InverseBooleanConverter x:Key="InverseBoolConverter" />
+</ResourceDictionary>
