@@ -37,6 +37,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Using Include="System.Windows.Input" />
+    
     <Using Include="WelpenScoreboard.WpfUI.ViewModels.Common" />
   </ItemGroup>
 
