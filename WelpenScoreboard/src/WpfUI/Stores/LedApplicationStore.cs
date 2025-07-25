@@ -17,6 +17,7 @@ internal class LedApplicationStore : ViewModelBase, ILedApplicationStore
             if (_status == value) return;
             _status = value;
             OnPropertyChanged(nameof(Status));
+            OnPropertyChanged(nameof(IsConnectedText));
         }
     }
 
@@ -51,8 +52,11 @@ internal class LedApplicationStore : ViewModelBase, ILedApplicationStore
         {
             _isConnected = value;
             OnPropertyChanged(nameof(IsConnected));
+            OnPropertyChanged(nameof(IsConnectedText));
         }
     }
+
+    public string IsConnectedText => IsConnected ? $"Connected ({Status})" : "Not Connected";
 
     public void UpdateStatus(StatusData statusData)
     {

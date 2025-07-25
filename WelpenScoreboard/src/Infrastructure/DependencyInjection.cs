@@ -13,7 +13,7 @@ public static class DependencyInjection
     {
         services.AddMqtt();
 
-        services.RegisterAssemblyTypes<IAlwaysActiveBackgroundWorker>(ServiceLifetime.Singleton, _infrastructureAssembly);
+        services.AddTypesFromAssemblies<IAlwaysActiveBackgroundWorker>(ServiceLifetime.Singleton, _infrastructureAssembly);
     }
 
     private static IServiceCollection AddMqtt(this IServiceCollection services)
@@ -22,6 +22,9 @@ public static class DependencyInjection
         services.AddSingleton<IMqttClient, Mqtt.MqttNetClient>();
         services.AddSingleton<IMqttControl, Mqtt.MqttControl>();
         services.AddSingleton<IMqttSettings, Mqtt.MqttSettings>();
+        services.AddSingleton<Application.Mqtt.Workers.IMqttAliveProgram, Mqtt.Workers.MqttAliveProgram>();
+        services.AddSingleton<Application.Mqtt.Workers.IMqttAliveWorker, Mqtt.Workers.MqttAliveWorker>();
+        services.AddTypesFromAssemblies<IMqttTopicParser>(ServiceLifetime.Singleton, _infrastructureAssembly);
 
         return services;
     }

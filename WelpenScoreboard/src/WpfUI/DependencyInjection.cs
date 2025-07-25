@@ -19,6 +19,8 @@ public static class DependencyInjection
         services.AddInfrastructure();
 
         services.AddServices();
+        services.AddStores();
+        services.AddUtility();
         services.AddSingleton<Views.MainWindow>();
         services.AddSingleton<ViewModels.MainViewModel>();
         services.RegisterAssemblyTypes<ITabViewModel>(ServiceLifetime.Singleton, _wpfAssembly);
@@ -27,6 +29,20 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddSingleton<Services.Startup>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddStores(this IServiceCollection services)
+    {
+        services.AddSingleton<Application.Led.ILedApplicationStore, Stores.LedApplicationStore>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddUtility(this IServiceCollection services)
+    {
+        services.AddSingleton<TimeProvider>(System.TimeProvider.System);
 
         return services;
     }

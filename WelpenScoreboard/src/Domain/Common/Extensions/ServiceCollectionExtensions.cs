@@ -34,4 +34,20 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddTypesFromAssemblies<TSearch>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient, params Assembly[] assemblies)
+    {
+        foreach (var assembly in assemblies)
+        {
+            var types = assembly.DefinedTypes.Where(x =>
+                typeof(TSearch).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract);
+
+            foreach (var type in types)
+            {
+                services.Add(new ServiceDescriptor(typeof(TSearch), type, lifetime));
+            }
+        }
+
+        return services;
+    }
 }

@@ -77,8 +77,14 @@
                                             <RowDefinition />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Margin="0,0,10,0"
+                                        
+                                        <TextBlock Grid.Row="0"
+                                                   Margin="0,0,10,0"
                                                    Text="{Binding SoftwareVersion}" />
+
+                                        <TextBlock Grid.Row="1"
+                                                   Margin="0,0,10,0"
+                                                   Text="{Binding LedApplicationStore.IsConnectedText}" />
                                     </Grid>
                                 </StackPanel>
                             </materialDesign:PopupBox>
