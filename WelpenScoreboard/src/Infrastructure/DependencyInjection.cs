@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using WelpenScoreboard.Application.Mqtt;
 using WelpenScoreboard.Domain.Common.Extensions;
 using WelpenScoreboard.Domain.Common.Interfaces;
+using WelpenScoreboard.Infrastructure.Persistence;
 
 namespace WelpenScoreboard.Infrastructure;
 public static class DependencyInjection
@@ -11,6 +14,7 @@ public static class DependencyInjection
 
     public static void AddInfrastructure(this IServiceCollection services)
     {
+        services.AddDbContext();
         services.AddMqtt();
 
         services.AddTypesFromAssemblies<IAlwaysActiveBackgroundWorker>(ServiceLifetime.Singleton, _infrastructureAssembly);
@@ -27,5 +31,29 @@ public static class DependencyInjection
         services.AddTypesFromAssemblies<IMqttTopicParser>(ServiceLifetime.Singleton, _infrastructureAssembly);
 
         return services;
+    }
+
+    private static IServiceCollection AddDbContext(this IServiceCollection services)
+    {
+        Action<DbContextOptionsBuilder> configureDbContext = b =>
+        {
+            b.UseSqlite(GetSqliteConnection(),
+                        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+        };
+
+        services.AddDbContext<ApplicationDbContext>(configureDbContext);
+        services.AddScoped<DbContext>(s => s.GetRequiredService<ApplicationDbContext>());
+
+        return services;
+    }
+
+    private static SqliteConnection GetSqliteConnection()
+    {
+        var connectionBuilder = new SqliteConnectionStringBuilder()
+        {
+            DataSource = "",
+        };
+
+        return new(connectionBuilder.ToString());
     }
 }
